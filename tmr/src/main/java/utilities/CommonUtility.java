@@ -18,7 +18,7 @@ public class CommonUtility {
      */
     public static String getCurrentDateAndTimeStampString() {
         // create formatter with required pattern
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-mm-yyyy hh:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy'T'HH:mm:ss");
 
         // return formatted current date and time as String
         return LocalDateTime.now().format(formatter);

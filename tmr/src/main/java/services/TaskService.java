@@ -57,7 +57,7 @@ public class TaskService {
         this.taskRepository.addNewTask(newTaskRecord);
 
         // create and return response dto object
-        return new TaskDataResponseDTO(newTaskRecord.getTaskId(),
+        return new TaskDataResponseDTO(newTaskRecord.getTaskId(), newTaskRecord.getTaskTitle(),
                 newTaskRecord.getTaskDescription(), newTaskRecord.getTaskCreatedOn());
     }
 
