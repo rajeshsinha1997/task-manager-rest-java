@@ -17,9 +17,10 @@ public class CommonUtility {
      * @return current date and time as String
      */
     public static String getCurrentDateAndTimeStampString() {
-        // Format the current date and time using a specific pattern and return the
-        // value as String
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        // create formatter with required pattern
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-mm-yyyy hh:mm:ss");
+
+        // return formatted current date and time as String
         return LocalDateTime.now().format(formatter);
     }
 

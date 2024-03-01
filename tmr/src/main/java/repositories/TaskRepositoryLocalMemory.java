@@ -5,9 +5,12 @@ import java.util.Map;
 
 import models.TaskModel;
 
+/**
+ * implementation class of the ITaskRepository interface with database as a
+ * local in-memory HashMap
+ */
 public class TaskRepositoryLocalMemory implements ITaskRepository {
-
-    // create local memory storage to store task data
+    // create local in-memory HashMap to store task data
     Map<String, TaskModel> tasks = new HashMap<>();
 
     @Override

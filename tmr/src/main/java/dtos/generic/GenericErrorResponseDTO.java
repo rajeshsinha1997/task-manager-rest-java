@@ -1,10 +1,15 @@
 package dtos.generic;
 
+import com.google.gson.annotations.SerializedName;
+
 import utilities.CommonUtility;
 
 public class GenericErrorResponseDTO {
-    // attributes of a response object
+    // attributes of the dto object
+    @SerializedName("response-time")
     private String responseTime;
+
+    @SerializedName("response-error-message")
     private String errorMessage;
 
     /**
@@ -15,6 +20,7 @@ public class GenericErrorResponseDTO {
      * @param responseData    - data to be added to the response
      */
     public GenericErrorResponseDTO(String errorMessage) {
+        // initialize attributes of the generic error response DTO instance
         this.responseTime = CommonUtility.getCurrentDateAndTimeStampString();
         this.errorMessage = errorMessage;
     }

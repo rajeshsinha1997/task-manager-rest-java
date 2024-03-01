@@ -10,7 +10,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>war</packaging>
 
-  <name>tmr Maven Webapp</name>
+  <name>Task Manager REST Api</name>
   <url>http://www.example.com</url>
 
   <properties>

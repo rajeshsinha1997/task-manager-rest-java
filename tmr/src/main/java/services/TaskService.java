@@ -2,6 +2,7 @@ package services;
 
 import dtos.request.TaskPostRequestDTO;
 import dtos.response.TaskDataResponseDTO;
+import exceptions.InvalidRequestAttributeValueException;
 import models.TaskModel;
 import repositories.ITaskRepository;
 import repositories.TaskRepositoryLocalMemory;
@@ -9,7 +10,6 @@ import utilities.CommonUtility;
 import utilities.DataValidationUtility;
 
 public class TaskService {
-
     // create instance of ITaskRepository
     private ITaskRepository taskRepository = new TaskRepositoryLocalMemory();
 
@@ -20,6 +20,12 @@ public class TaskService {
      *                           be created
      */
     public TaskDataResponseDTO createNewTask(TaskPostRequestDTO newTaskToBeCreated) {
+        // check if the instance of the dto is null, i.e. no request body was provided
+        if (newTaskToBeCreated == null) {
+            // throw appropriate exception
+            throw new InvalidRequestAttributeValueException("AN EMPTY REQUEST BODY IS NOT VALID");
+        }
+
         // validate new task data
         DataValidationUtility.validateTaskTitle(newTaskToBeCreated.getTaskTitle(), false);
         DataValidationUtility.validateTaskDescription(newTaskToBeCreated.getTaskDescription(), true);

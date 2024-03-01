@@ -3,6 +3,7 @@ package dtos.response;
 import com.google.gson.annotations.SerializedName;
 
 public class TaskDataResponseDTO {
+    // attributes of the dto object
     @SerializedName("task-id")
     private String taskId;
 
@@ -21,6 +22,7 @@ public class TaskDataResponseDTO {
      *                        created
      */
     public TaskDataResponseDTO(String taskId, String taskDescription, String taskCreatedOn) {
+        // initialize the attributes of the dto object
         this.taskId = taskId;
         this.taskDescription = taskDescription;
         this.taskCreatedOn = taskCreatedOn;

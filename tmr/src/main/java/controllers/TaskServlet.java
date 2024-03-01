@@ -2,11 +2,9 @@ package controllers;
 
 import java.io.IOException;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
-import dtos.generic.GenericResponseDTO;
 import dtos.request.TaskPostRequestDTO;
 import dtos.response.TaskDataResponseDTO;
 import exceptions.InvalidRequestAttributeValueException;
@@ -19,12 +17,18 @@ import services.TaskService;
 import utilities.CommonServletUtility;
 
 @WebServlet(urlPatterns = "/tasks", name = "tasks")
+/**
+ * servlet class for processing requests and responses related to the task
+ * objects
+ */
 public class TaskServlet extends HttpServlet {
-
     // create instance of TaskService
     private final transient TaskService taskService = new TaskService();
 
     @Override
+    /**
+     * method to process POST requests and build corresponding responses
+     */
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         try {
             // get mapped request body
@@ -34,17 +38,15 @@ public class TaskServlet extends HttpServlet {
             // call service method to create a new task
             TaskDataResponseDTO responseData = this.taskService.createNewTask(postRequestDTO);
 
-            // set response metadata
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
-            resp.setStatus(201);
-
-            // add new task data to the response
-            resp.getWriter().write(new Gson().toJson(new GenericResponseDTO<TaskDataResponseDTO>(responseData)));
-        } catch (JsonSyntaxException | JsonIOException | IOException | InvalidRequestAttributeValueException e) {
+            // build success response
+            CommonServletUtility.buildSuccessResponse(resp, 201, responseData);
+        } catch (JsonSyntaxException | JsonIOException | IOException
+                | InvalidRequestAttributeValueException e) {
             // handle exceptions
             CommonServletUtility.buildErrorResponse(resp,
-                    (e instanceof InvalidRequestAttributeValueException) ? 400 : 500, e);
+                    (e instanceof InvalidRequestAttributeValueException || e instanceof JsonSyntaxException) ? 400
+                            : 500,
+                    e);
         }
     }
 

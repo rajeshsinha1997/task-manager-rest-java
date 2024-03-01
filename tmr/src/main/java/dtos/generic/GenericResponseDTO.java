@@ -1,10 +1,15 @@
 package dtos.generic;
 
+import com.google.gson.annotations.SerializedName;
+
 import utilities.CommonUtility;
 
 public class GenericResponseDTO<T> {
-    // attributes of a response object
+    // attributes of the dto object
+    @SerializedName("response-time")
     private String responseTime;
+
+    @SerializedName("response-data")
     private T responseData;
 
     /**
@@ -14,6 +19,7 @@ public class GenericResponseDTO<T> {
      * @param responseData - data to be added to the response
      */
     public GenericResponseDTO(T responseData) {
+        // initialize attributes of generic success response DTO instance
         this.responseTime = CommonUtility.getCurrentDateAndTimeStampString();
         this.responseData = responseData;
     }

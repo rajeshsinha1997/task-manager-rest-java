@@ -24,7 +24,7 @@ public class DataValidationUtility {
         // is not allowed
         if ((taskTitle == null || taskTitle.isBlank()) && !isNullOrEmptyValueAllowed) {
             // throw appropriate exception
-            throw new InvalidRequestAttributeValueException("task title can't be null or empty");
+            throw new InvalidRequestAttributeValueException("TASK TITLE CAN'T BE NULL OR EMPTY");
         }
 
         // if the given task title is null or blank then return null else return the
@@ -47,7 +47,7 @@ public class DataValidationUtility {
         // is not allowed
         if ((taskDescription == null || taskDescription.isBlank()) && !isNullOrEmptyValueAllowed) {
             // throw appropriate exception
-            throw new InvalidRequestAttributeValueException("task description can't be null or empty");
+            throw new InvalidRequestAttributeValueException("TASK DESCRIPTION CAN'T BE NULL OR EMPTY");
         }
 
         // if the given task title is null or blank then return null else return the
