@@ -1,9 +1,11 @@
 package repositories;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import models.TaskModel;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * implementation class of the ITaskRepository interface with database as a
@@ -12,6 +14,12 @@ import models.TaskModel;
 public class TaskRepositoryLocalMemory implements ITaskRepository {
     // create local in-memory HashMap to store task data
     Map<String, TaskModel> tasks = new HashMap<>();
+
+    @Override
+    public List<TaskModel> findAllTasks() {
+        // return all tasks from database
+        return new ArrayList<>(tasks.values());
+    }
 
     @Override
     public TaskModel findTaskById(String taskId) {

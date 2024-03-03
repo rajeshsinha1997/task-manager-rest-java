@@ -2,7 +2,16 @@ package repositories;
 
 import models.TaskModel;
 
+import java.util.List;
+
 public interface ITaskRepository {
+    /**
+     * method to get all tasks from database
+     *
+     * @return - all tasks from database
+     */
+    public List<TaskModel> findAllTasks();
+
     /**
      * method to find a task by it's corresponding id from database
      * 
