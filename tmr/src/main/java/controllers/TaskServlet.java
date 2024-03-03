@@ -3,7 +3,6 @@ package controllers;
 import java.io.IOException;
 import java.util.List;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
@@ -26,24 +25,21 @@ import utilities.CommonServletUtility;
 public class TaskServlet extends HttpServlet {
     // create instance of TaskService
     private final transient TaskService taskService = new TaskService();
-    private final transient Gson gson = new Gson();
 
     @Override
     /**
      * method to process GET request to fetch all available tasks
      */
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         try {
+            // call service method to get all tasks
             List<TaskDataResponseDTO> tasks = this.taskService.getAllTasks();
 
-            String jsonResponse = gson.toJson(tasks);
-
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
-
-            resp.getWriter().write(jsonResponse);
-        } catch (JsonSyntaxException | JsonIOException e) {
-            CommonServletUtility.buildErrorResponse(resp, 500, e);
+            // build success response
+            CommonServletUtility.buildSuccessResponse(resp, 200, tasks);
+        } catch (JsonIOException e) {
+            // handle exceptions
+            CommonServletUtility.buildErrorResponse(resp,500, e);
         }
     }
 
