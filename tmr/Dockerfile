@@ -17,10 +17,13 @@ COPY ./src .
 RUN ["mvn", "package"]
 
 # get tomcat image
-FROM tomcat:10.1.19-jre17-temurin-jammy AS tomcat
+FROM tomcat:10.1.19 AS tomcat
 
 # expose port
 EXPOSE 8080
 
 # copy the generated war file into the tomcat working directory
-COPY --from=base /usr/app/target/*.war /usr/local/tomcat/webapps/app.war
+COPY --from=base /usr/app/target/*.war /usr/local/tomcat/webapps/
+
+# run tomcat server
+CMD ["catalina.sh", "run"]
