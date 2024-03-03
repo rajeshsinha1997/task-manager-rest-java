@@ -2,7 +2,6 @@ package repositories;
 
 import models.TaskModel;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ public class TaskRepositoryLocalMemory implements ITaskRepository {
     @Override
     public List<TaskModel> findAllTasks() {
         // return all tasks from database
-        return new ArrayList<>(tasks.values());
+        return (List<TaskModel>) tasks.values();
     }
 
     @Override
