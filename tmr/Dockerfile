@@ -13,6 +13,11 @@ RUN git clone --branch dev --single-branch https://github.com/rajeshsinha1997/ta
 WORKDIR /usr/src/app/task-manager-rest-java/tmr
 # build deployebale package
 RUN mvn package
+# ------------------------------------------- LABEL ----------------------------------------------
+LABEL maintainer="RAJESH SINHA"
+LABEL language="JAVA"
+LABEL framework="SERVLET"
+# ------------------------------------------------------------------------------------------------
 # ------------------------------------------ TOMCAT ----------------------------------------------
 # get tomcat image
 FROM tomcat:10.1.19 AS servedev
@@ -32,6 +37,11 @@ RUN git clone --branch main --single-branch https://github.com/rajeshsinha1997/t
 WORKDIR /usr/src/app/task-manager-rest-java/tmr
 # build deployebale package
 RUN mvn package
+# ------------------------------------------- LABEL ----------------------------------------------
+LABEL maintainer="RAJESH SINHA"
+LABEL language="JAVA"
+LABEL framework="SERVLET"
+# ------------------------------------------------------------------------------------------------
 # ------------------------------------------ TOMCAT ----------------------------------------------
 # get tomcat image
 FROM tomcat:10.1.19 AS serveprod
