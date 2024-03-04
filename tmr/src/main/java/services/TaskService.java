@@ -9,9 +9,32 @@ import repositories.TaskRepositoryLocalMemory;
 import utilities.CommonUtility;
 import utilities.DataValidationUtility;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class TaskService {
     // create instance of ITaskRepository
     private ITaskRepository taskRepository = new TaskRepositoryLocalMemory();
+
+    /**
+     * retrieves all tasks from the database and converts them into a list of TaskDataResponseDTO objects
+     *
+     * @return list of TaskDataResponseDTO objects representing all tasks in the database
+     */
+    public List<TaskDataResponseDTO> getAllTasks() {
+        // get all tasks from repository
+        List<TaskModel> allTasks = taskRepository.findAllTasks();
+
+        // map all TaskModel to TaskDataResponseDTO
+        return allTasks.stream()
+                .map(taskModel -> new TaskDataResponseDTO(
+                        taskModel.getTaskId(),
+                        taskModel.getTaskTitle(),
+                        taskModel.getTaskDescription(),
+                        taskModel.getTaskCreatedOn()
+                ))
+                .collect(Collectors.toList());
+    }
 
     /**
      * method to create a new task record
