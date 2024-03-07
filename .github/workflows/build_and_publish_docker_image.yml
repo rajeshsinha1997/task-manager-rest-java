@@ -31,7 +31,6 @@ jobs:
                 no-cache: true
                 push: true
                 context: ${{github.workspace}}/tmr/
-                file: ./Dockerfile
                 target: serveprod
                 tags: ${{secrets.DOCKER_USERNAME}}/task-manager-rest-api:latest
             
