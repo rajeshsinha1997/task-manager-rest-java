@@ -11,7 +11,8 @@ jobs:
         runs-on: ubuntu-latest
         steps:           
             - name: Extract Maven Project Version
-              run: echo ::set-output name=version::$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+              working-directory: ./tmr
+              run: echo "echo version=${{ mvn help:evaluate -Dexpression=project.version -q -DforceStdout }}" >> $GITHUB_ENV
               id: project
             
             - name: Log-In to Docker Hub
