@@ -16,8 +16,8 @@ public class TaskRepositoryLocalMemory implements ITaskRepository {
 
     @Override
     public List<TaskModel> findAllTasks() {
-        // return all tasks from database
-        return (List<TaskModel>) tasks.values();
+        // return all tasks from database as a list
+        return tasks.values().stream().toList();
     }
 
     @Override

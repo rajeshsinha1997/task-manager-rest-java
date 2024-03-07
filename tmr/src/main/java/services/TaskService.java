@@ -17,22 +17,21 @@ public class TaskService {
     private ITaskRepository taskRepository = new TaskRepositoryLocalMemory();
 
     /**
-     * retrieves all tasks from the database and converts them into a list of TaskDataResponseDTO objects
+     * retrieves all tasks from the database and maps them into a list of
+     * TaskDataResponseDTO objects
      *
-     * @return list of TaskDataResponseDTO objects representing all tasks in the database
+     * @return list of TaskDataResponseDTO objects representing all tasks in the
+     *         database
      */
     public List<TaskDataResponseDTO> getAllTasks() {
-        // get all tasks from repository
-        List<TaskModel> allTasks = taskRepository.findAllTasks();
-
-        // map all TaskModel to TaskDataResponseDTO
-        return allTasks.stream()
+        // call repository method to get list of all available tasks and return after
+        // mapping the list items to the required result DTO type
+        return this.taskRepository.findAllTasks().stream()
                 .map(taskModel -> new TaskDataResponseDTO(
                         taskModel.getTaskId(),
                         taskModel.getTaskTitle(),
                         taskModel.getTaskDescription(),
-                        taskModel.getTaskCreatedOn()
-                ))
+                        taskModel.getTaskCreatedOn()))
                 .collect(Collectors.toList());
     }
 

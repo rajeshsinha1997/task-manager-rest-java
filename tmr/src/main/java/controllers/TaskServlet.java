@@ -1,8 +1,6 @@
 package controllers;
 
 import java.io.IOException;
-import java.util.List;
-
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
@@ -28,19 +26,12 @@ public class TaskServlet extends HttpServlet {
 
     @Override
     /**
-     * method to process GET request to fetch all available tasks
+     * method to process GET requests and build corresponding responses
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-        try {
-            // call service method to get all tasks
-            List<TaskDataResponseDTO> tasks = this.taskService.getAllTasks();
-
-            // build success response
-            CommonServletUtility.buildSuccessResponse(resp, 200, tasks);
-        } catch (JsonIOException e) {
-            // handle exceptions
-            CommonServletUtility.buildErrorResponse(resp,500, e);
-        }
+        // build success response with the result from calling the service function to
+        // get list of all available tasks
+        CommonServletUtility.buildSuccessResponse(resp, 200, this.taskService.getAllTasks());
     }
 
     @Override
