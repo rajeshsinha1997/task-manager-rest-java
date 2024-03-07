@@ -9,12 +9,7 @@ jobs:
     build_and_push_docker_image_to_docker_hub:
         name: Build and Push Docker Image to Docker Hub
         runs-on: ubuntu-latest
-        steps:           
-            - name: Extract Maven Project Version
-              working-directory: ./tmr
-              run: echo "echo version=${{ mvn help:evaluate -Dexpression=project.version -q -DforceStdout }}" >> $GITHUB_ENV
-              id: project
-            
+        steps:
             - name: Log-In to Docker Hub
               uses: docker/login-action@v3.0.0
               with:
@@ -35,5 +30,5 @@ jobs:
                 context: ./tmr/
                 file: ./Dockerfile
                 target: serveprod
-                tags: ${{secrets.DOCKER_USERNAME}}/task-manager-rest-api:${{ steps.project.outputs.version }}
+                tags: ${{secrets.DOCKER_USERNAME}}/task-manager-rest-api:latest
             
