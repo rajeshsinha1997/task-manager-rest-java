@@ -25,8 +25,11 @@ jobs:
           with:
             languages: 'java-kotlin'
         
-        - name: Autobuild
-          uses: github/codeql-action/autobuild@v3
+        - name: Setup Java
+          uses: actions/setup-java@v4.1.0
+          with:
+            distribution: 'oracle'
+            java-version: 17
 
         - name: Perform CodeQL Analysis
           uses: github/codeql-action/analyze@v3
