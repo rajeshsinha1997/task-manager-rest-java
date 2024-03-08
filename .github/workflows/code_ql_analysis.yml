@@ -1,0 +1,17 @@
+name: CodeQL Analysis
+
+on: 
+    pull_request: 
+        branches: 
+            -"**"
+    push:
+        branches: 
+            - "**"
+    schedule:
+      - cron: "0 0 * * *"
+
+jobs:
+  code_ql_analysis:
+    name: CodeQL Analaysis
+
+    runs-on: ubuntu-latest
