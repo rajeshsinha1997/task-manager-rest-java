@@ -1,0 +1,42 @@
+name: CodeQL Analysis
+
+on: 
+    pull_request: 
+        branches: 
+            -"**"
+    push:
+        branches: 
+            - "**"
+    schedule:
+      - cron: "0 0 * * *"
+
+jobs:
+  code_ql_analysis:
+    name: CodeQL Analaysis
+    runs-on: ubuntu-latest
+    permissions: 
+      security-events: write
+
+    steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4.1.1
+
+        - name: Initialize CodeQL
+          uses: github/codeql-action/init@v3
+          with:
+            languages: 'java-kotlin'
+                    
+        - name: Setup Java
+          uses: actions/setup-java@v4.1.0
+          with:
+            distribution: 'oracle'
+            java-version: 17
+        
+        - name: Build Java Project
+          run: mvn clean install --file ${{github.workspace}}/tmr/pom.xml
+
+        - name: Perform CodeQL Analysis
+          uses: github/codeql-action/analyze@v3
+          with:
+            checkout_path: ${{github.workspace}}/tmr
+            category: "/language:java-kotlin"
