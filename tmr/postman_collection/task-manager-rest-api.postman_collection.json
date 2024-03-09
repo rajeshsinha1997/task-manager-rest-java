@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"task-title\": \"Task Title\",\n    \"task-description\": \"Task Description\"\n}",
+					"raw": "{\n    \"task-title\":\"Demo Task Title\",\n    \"task-description\": \"Demo Task Description\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -35,19 +35,10 @@
 			},
 			"response": [
 				{
-					"name": "create-task-with-description",
+					"name": "400 - No Request Body",
 					"originalRequest": {
 						"method": "POST",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"task-title\": \"Task Title\",\n    \"task-description\": \"Task Description\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
 							"raw": "http://localhost:8080/tmr/tasks",
 							"protocol": "http",
@@ -61,8 +52,8 @@
 							]
 						}
 					},
-					"status": "Created",
-					"code": 201,
+					"status": "Bad Request",
+					"code": 400,
 					"_postman_previewlanguage": "json",
 					"header": [
 						{
@@ -71,32 +62,130 @@
 						},
 						{
 							"key": "Content-Length",
-							"value": "210"
+							"value": "101"
 						},
 						{
 							"key": "Date",
-							"value": "Fri, 01 Mar 2024 05:34:59 GMT"
-						},
-						{
-							"key": "Keep-Alive",
-							"value": "timeout=20"
+							"value": "Thu, 07 Mar 2024 13:42:53 GMT"
 						},
 						{
 							"key": "Connection",
-							"value": "keep-alive"
+							"value": "close"
 						}
 					],
 					"cookie": [],
-					"body": "{\n    \"response-time\": \"01-03-2024T11:04:59\",\n    \"response-data\": {\n        \"task-id\": \"844cf986-9cc6-4890-920d-7847349c4b77\",\n        \"task-title\": \"Task Title\",\n        \"task-description\": \"Task Description\",\n        \"task-created-on\": \"01-03-2024T11:04:59\"\n    }\n}"
+					"body": "{\n    \"response-time\": \"07-03-2024T19:12:53\",\n    \"response-error-message\": \"AN EMPTY REQUEST BODY IS NOT VALID\"\n}"
 				},
 				{
-					"name": "create-task-without-description",
+					"name": "400 - Task Title Not Provided In Request Body",
 					"originalRequest": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"task-title\": \"Task Title\"\n}",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "105"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 07 Mar 2024 13:43:24 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"07-03-2024T19:13:24\",\n    \"response-error-message\": \"TASK TITLE CAN'T BE NULL OR EMPTY\"\n}"
+				},
+				{
+					"name": "400 - Task Title Empty In Request Body",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"task-title\":\"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "105"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 07 Mar 2024 13:44:03 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"07-03-2024T19:14:03\",\n    \"response-error-message\": \"TASK TITLE CAN'T BE NULL OR EMPTY\"\n}"
+				},
+				{
+					"name": "201 - Task with Title and Description",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"task-title\":\"Demo Task Title\",\n    \"task-description\": \"Demo Task Description\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -126,11 +215,11 @@
 						},
 						{
 							"key": "Content-Length",
-							"value": "172"
+							"value": "220"
 						},
 						{
 							"key": "Date",
-							"value": "Fri, 01 Mar 2024 05:36:09 GMT"
+							"value": "Thu, 07 Mar 2024 13:45:03 GMT"
 						},
 						{
 							"key": "Keep-Alive",
@@ -142,7 +231,129 @@
 						}
 					],
 					"cookie": [],
-					"body": "{\n    \"response-time\": \"01-03-2024T11:06:09\",\n    \"response-data\": {\n        \"task-id\": \"eebd6542-90ff-4720-82c9-dd5e3f340a39\",\n        \"task-title\": \"Task Title\",\n        \"task-created-on\": \"01-03-2024T11:06:09\"\n    }\n}"
+					"body": "{\n    \"response-time\": \"07-03-2024T19:15:03\",\n    \"response-data\": {\n        \"task-id\": \"328caaa8-6258-4464-8fe5-68946c24417f\",\n        \"task-title\": \"Demo Task Title\",\n        \"task-description\": \"Demo Task Description\",\n        \"task-created-on\": \"07-03-2024T19:15:03\"\n    }\n}"
+				},
+				{
+					"name": "201 - Task with Title Only",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"task-title\":\"Demo Task Title\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "177"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 07 Mar 2024 13:45:39 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"07-03-2024T19:15:39\",\n    \"response-data\": {\n        \"task-id\": \"77d631fd-6288-41de-926e-284270f8226b\",\n        \"task-title\": \"Demo Task Title\",\n        \"task-created-on\": \"07-03-2024T19:15:39\"\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "Get All Tasks",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/tmr/tasks",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"tmr",
+						"tasks"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "200 - Fetched All Tasks",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "58"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 09 Mar 2024 09:08:31 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"09-03-2024T14:38:31\",\n    \"response-data\": []\n}"
 				}
 			]
 		}
