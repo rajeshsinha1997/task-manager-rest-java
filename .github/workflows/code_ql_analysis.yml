@@ -16,6 +16,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    permissions: 
+      security-events: write
+
     steps:
         - name: Checkout Repository
           uses: actions/checkout@v4.1.1
@@ -25,7 +28,7 @@ jobs:
           with:
             distribution: 'oracle'
             java-version: 17
-        
+
         - name: Initialize CodeQL
           uses: github/codeql-action/init@v3
           with:
@@ -34,4 +37,5 @@ jobs:
         - name: Perform CodeQL Analysis
           uses: github/codeql-action/analyze@v3
           with:
+            checkout_path: ${{github.workspace}}/tmr
             category: "/language:java-kotlin"
