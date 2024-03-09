@@ -83,4 +83,35 @@ public class TaskService {
                 newTaskRecord.getTaskDescription(), newTaskRecord.getTaskCreatedOn());
     }
 
+    /**
+     * method to find a task with a specific id
+     * 
+     * @param taskId - id value to use to find the expected task object
+     * @return an instance of TaskDataResponseDTO if a task object found with the
+     *         given id
+     * @throws InvalidRequestAttributeValueException - if no task object found with
+     *                                               the given task id
+     * @throws InvalidRequestAttributeValueException - if the given task id is
+     *                                               invalid
+     */
+    public TaskDataResponseDTO getTaskById(String taskId) {
+        // check if the given task id is valid
+        if (DataValidationUtility.isValidTaskId(taskId)) {
+            // find task with the given id from the database
+            TaskModel existingTask = this.taskRepository.findTaskById(taskId);
+
+            // check if the existing task object is null
+            if (existingTask == null) {
+                // throw corresponding exception
+                throw new InvalidRequestAttributeValueException("NO TASK FOUND WITH GIVEN ID: " + taskId);
+            } else {
+                // map task data to the response type DTO object and return
+                return new TaskDataResponseDTO(existingTask.getTaskId(), existingTask.getTaskTitle(),
+                        existingTask.getTaskDescription(), existingTask.getTaskCreatedOn());
+            }
+        } else {
+            // throw corresponding exception
+            throw new InvalidRequestAttributeValueException("INVALID TASK ID: " + taskId);
+        }
+    }
 }

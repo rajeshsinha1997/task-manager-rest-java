@@ -21,7 +21,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/tmr/tasks",
+					"raw": "http://localhost:8080/tmr/tasks/",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -29,7 +29,8 @@
 					"port": "8080",
 					"path": [
 						"tmr",
-						"tasks"
+						"tasks",
+						""
 					]
 				}
 			},
@@ -291,12 +292,12 @@
 			]
 		},
 		{
-			"name": "Get All Tasks",
+			"name": "get-all-tasks",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/tmr/tasks",
+					"raw": "http://localhost:8080/tmr/tasks/",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -304,7 +305,8 @@
 					"port": "8080",
 					"path": [
 						"tmr",
-						"tasks"
+						"tasks",
+						""
 					]
 				}
 			},
@@ -354,6 +356,162 @@
 					],
 					"cookie": [],
 					"body": "{\n    \"response-time\": \"09-03-2024T14:38:31\",\n    \"response-data\": []\n}"
+				}
+			]
+		},
+		{
+			"name": "get-task-by-id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/tmr/tasks/a692786f-af77-4101-a8e8-b294c7f62737/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"tmr",
+						"tasks",
+						"a692786f-af77-4101-a8e8-b294c7f62737",
+						""
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "400 - invalid numeric task id",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks",
+								"1"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "85"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 09 Mar 2024 18:27:40 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"09-03-2024T23:57:40\",\n    \"response-error-message\": \"INVALID TASK ID: 1\"\n}"
+				},
+				{
+					"name": "400 - invalid alphabetic task id",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks/a",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks",
+								"a"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "85"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 09 Mar 2024 18:28:09 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"09-03-2024T23:58:09\",\n    \"response-error-message\": \"INVALID TASK ID: a\"\n}"
+				},
+				{
+					"name": "200 - success with valid task id",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks/c4892fc5-a821-4120-a772-7d2c5beed736",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks",
+								"c4892fc5-a821-4120-a772-7d2c5beed736"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "220"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 09 Mar 2024 18:29:02 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"09-03-2024T23:59:02\",\n    \"response-data\": {\n        \"task-id\": \"c4892fc5-a821-4120-a772-7d2c5beed736\",\n        \"task-title\": \"Demo Task Title\",\n        \"task-description\": \"Demo Task Description\",\n        \"task-created-on\": \"09-03-2024T23:58:50\"\n    }\n}"
 				}
 			]
 		}

@@ -91,4 +91,57 @@ public class CommonServletUtility {
             // TODO: log error message to console
         }
     }
+
+    /**
+     * method to get path information from the request object
+     * 
+     * @param request - an instance of HttpServletRequest as the request object
+     * @return an empty string if no path information is available, else the path
+     *         information string
+     */
+    public static String getRequestUrlPathInfo(HttpServletRequest request) {
+        // get path information from the request url
+        String pathInformation = request.getPathInfo();
+
+        // check if the path information was not present or is an empty string or only
+        // contains a single '/'
+        if (pathInformation == null || pathInformation.trim().isBlank() || pathInformation.trim().equals("/")) {
+            // return an empty string value
+            return "";
+        } else {
+            // trim the leading and trailing white-spaces from the path information data
+            pathInformation = pathInformation.trim();
+
+            // check if the given request path information data starts with a '/' then
+            // remove it from the request path information data
+            if (pathInformation.length() > 0 && pathInformation.charAt(0) == '/') {
+                pathInformation = pathInformation.substring(1,
+                        pathInformation.length());
+            }
+
+            // check if the given request path information data ends with a '/' then
+            // remove it from the request path information data
+            if (pathInformation.charAt(pathInformation.length() - 1) == '/') {
+                pathInformation = pathInformation.substring(0,
+                        pathInformation.length() - 1);
+            }
+
+            // return the path information string after trimming the leading and trailing
+            // white-spaces
+            return pathInformation.trim();
+        }
+    }
+
+    /**
+     * method to create request path information data array
+     * 
+     * @param requestPathInformationData - non-empty and not-null path information
+     *                                   data received from the request
+     * @return an String array which contains the path information data
+     */
+    public static String[] getRequestPathInformationDataAsArray(String requestPathInformationData) {
+        // create and return the string array by splitting the request path information
+        // data by '/'
+        return requestPathInformationData.split("/");
+    }
 }
