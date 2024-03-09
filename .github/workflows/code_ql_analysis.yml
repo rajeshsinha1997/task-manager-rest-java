@@ -13,9 +13,7 @@ on:
 jobs:
   code_ql_analysis:
     name: CodeQL Analaysis
-
     runs-on: ubuntu-latest
-
     permissions: 
       security-events: write
 
