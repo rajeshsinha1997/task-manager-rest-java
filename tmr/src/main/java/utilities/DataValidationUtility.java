@@ -1,5 +1,7 @@
 package utilities;
 
+import java.util.UUID;
+
 import exceptions.InvalidRequestAttributeValueException;
 
 public class DataValidationUtility {
@@ -53,5 +55,24 @@ public class DataValidationUtility {
         // if the given task title is null or blank then return null else return the
         // given string by trimming the leading and trailing spaces
         return taskDescription == null || taskDescription.isBlank() ? null : taskDescription.trim();
+    }
+
+    /**
+     * method to check if a given task id is valid
+     * 
+     * @param taskId - task id to verify
+     * @return true if the task id is valid, false otherwise
+     */
+    public static boolean isValidTaskId(String taskId) {
+        try {
+            // try to interpret the given task id as a UUID
+            UUID.fromString(taskId);
+
+            // return true as the given string is a valid task id
+            return true;
+        } catch (IllegalArgumentException e) {
+            // return false as the given string is not a valid task id
+            return false;
+        }
     }
 }
