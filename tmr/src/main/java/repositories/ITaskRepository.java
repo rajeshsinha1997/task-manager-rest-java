@@ -26,4 +26,11 @@ public interface ITaskRepository {
      * @param newTask - instance of TaskModel, i.e. new task object to be added
      */
     public void addNewTask(TaskModel newTask);
+
+    /**
+     * method to delete an existing task from database by it's corresponding id
+     * 
+     * @param taskId - id of the existing task object to delete
+     */
+    public void deleteTaskById(String taskId);
 }

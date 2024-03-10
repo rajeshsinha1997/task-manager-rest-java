@@ -114,4 +114,36 @@ public class TaskService {
             throw new InvalidRequestAttributeValueException("INVALID TASK ID: " + taskId);
         }
     }
+
+    /**
+     * method to delete an existing task with the given id
+     * 
+     * @param taskId - id of the existing task object to delete
+     * @return deleted task object as an instance of TaskDataResponseDTO
+     * @throws InvalidRequestAttributeValueException - if the give id of the
+     *                                               existing task is invalid
+     */
+    public TaskDataResponseDTO deleteTaskById(String taskId) {
+        // check if the given task id is valid
+        if (DataValidationUtility.isValidTaskId(taskId)) {
+            // fetch the existing task object with the given id
+            TaskModel existingTaskObject = this.taskRepository.findTaskById(taskId);
+
+            // check if a task object exists with the given id
+            if (existingTaskObject == null) {
+                // throw corresponding exception
+                throw new InvalidRequestAttributeValueException("NO TASK FOUND WITH GIVEN ID: " + taskId);
+            }
+
+            // delete existing task object
+            this.taskRepository.deleteTaskById(taskId);
+
+            // return the deleted task object mapped as an instance of TaskDataResponseDTO
+            return new TaskDataResponseDTO(existingTaskObject.getTaskId(), existingTaskObject.getTaskTitle(),
+                    existingTaskObject.getTaskDescription(), existingTaskObject.getTaskCreatedOn());
+        } else {
+            // throw corresponding exception
+            throw new InvalidRequestAttributeValueException("INVALID TASK ID: " + taskId);
+        }
+    }
 }
