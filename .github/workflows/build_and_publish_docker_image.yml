@@ -2,8 +2,8 @@ name: Build And Publish Docker Image
 
 on: 
    push: 
-    branches: 
-        - main
+    tags: 
+      - '*'
     
 jobs:
     build_and_push_docker_image_to_docker_hub:
@@ -25,6 +25,12 @@ jobs:
               with:
                 cleanup: true
             
+            - name: Get Release Tag Number
+              id: release_tag_number
+              uses: dawidd6/action-get-tag@v1.1.0
+              with:
+                strip_v: true
+            
             - name: Build and push Docker image
               uses: docker/build-push-action@v5.1.0
               with:
@@ -32,5 +38,5 @@ jobs:
                 push: true
                 context: ${{github.workspace}}/tmr/
                 target: serveprod
-                tags: ${{secrets.DOCKER_USERNAME}}/task-manager-rest-api:latest
+                tags: ${{secrets.DOCKER_USERNAME}}/task-manager-rest-api:${{steps.release_tag_number.outputs.tag}}
             

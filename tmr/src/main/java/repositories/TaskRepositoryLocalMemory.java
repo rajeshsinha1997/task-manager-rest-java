@@ -16,21 +16,36 @@ public class TaskRepositoryLocalMemory implements ITaskRepository {
 
     @Override
     public List<TaskModel> findAllTasks() {
-        // return all tasks from database as a list
-        return tasks.values().stream().toList();
+        // return all tasks from database which are not deleted as a list
+        return tasks.values().stream().filter(task -> !task.isTaskDeleted()).toList();
     }
 
     @Override
     public TaskModel findTaskById(String taskId) {
-        // find and return the required task from the database using the given task id,
-        // return null if no task exists with the given task id
-        return tasks.getOrDefault(taskId, null);
+        // find the required task from the database using the given task id
+        TaskModel existingTaskObject = tasks.getOrDefault(taskId, null);
+
+        // check if no existing task object found or the existing task object is deleted
+        // already
+        if (existingTaskObject == null || existingTaskObject.isTaskDeleted()) {
+            // return null as no task found with the given id
+            return null;
+        }
+        // else return the existing task object
+        else
+            return existingTaskObject;
     }
 
     @Override
     public void addNewTask(TaskModel newTask) {
         // add new task record (i.e. instance of TaskModel) to the database
         tasks.put(newTask.getTaskId(), newTask);
+    }
+
+    @Override
+    public void deleteTaskById(String taskId) {
+        // update 'isDeleted' flag attribute value of the existing task object
+        tasks.get(taskId).setTaskDeleted(true);
     }
 
 }
