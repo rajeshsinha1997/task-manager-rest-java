@@ -33,4 +33,10 @@ public class TaskRepositoryLocalMemory implements ITaskRepository {
         tasks.put(newTask.getTaskId(), newTask);
     }
 
+    @Override
+    public void deleteTaskById(String taskId) {
+        // update 'isDeleted' flag attribute value of the existing task object
+        tasks.get(taskId).setTaskDeleted(true);
+    }
+
 }
