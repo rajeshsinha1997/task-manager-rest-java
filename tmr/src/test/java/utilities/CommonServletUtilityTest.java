@@ -34,15 +34,20 @@ class CommonServletUtilityTest {
     }
 
     /**
-     * tests JSON deserialization to a POJO.
+     * tests JSON deserialization to a POJO
      */
     @Test
     void deserializeJson() throws IOException {
+        // sample JSON body to test deserialization
         String jsonBody = "{\"task-title\":\"New Task\", \"task-description\":\"Description of the new task\"}";
+
+        // simulating reading from a HttpServletRequest
         BufferedReader reader = new BufferedReader(new StringReader(jsonBody));
         when(mockRequest.getReader()).thenReturn(reader);
 
+        // performing the deserialization
         TaskPostRequestDTO dto = CommonServletUtility.mapRequestBodyToObject(mockRequest, TaskPostRequestDTO.class);
+
         assertNotNull(dto);
         assertEquals("New Task", dto.getTaskTitle(), "Task title does not match.");
         assertEquals("Description of the new task", dto.getTaskDescription(), "Task description does not match.");
@@ -53,11 +58,13 @@ class CommonServletUtilityTest {
      */
     @Test
     void malformedJsonException() {
+        // malformed JSON input
         String malformedJson = "{\"taskTitle:\"Incomplete Task\"";
         BufferedReader reader = new BufferedReader(new StringReader(malformedJson));
         try {
             when(mockRequest.getReader()).thenReturn(reader);
 
+            // asserts that an exception is thrown for malformed JSON
             assertThrows(JsonSyntaxException.class, () ->
                             CommonServletUtility.mapRequestBodyToObject(mockRequest, TaskPostRequestDTO.class),
                     "Should throw an exception for malformed JSON");
@@ -82,13 +89,55 @@ class CommonServletUtilityTest {
      */
     @Test
     void buildSuccessResponse() {
+        // DTO to send in the response
         TaskDataResponseDTO dto = new TaskDataResponseDTO(null, null, null, null);
         dto.setTaskId("2");
         dto.setTaskTitle("New Task");
         dto.setTaskDescription("Description of the new task");
-        dto.setTaskCreatedOn("01-01-2020");
+        dto.setTaskCreatedOn("01-01-2023");
+
+        // building the success response
         CommonServletUtility.buildSuccessResponse(mockResponse, HttpServletResponse.SC_OK, dto);
         verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
         assertTrue(responseWriter.toString().contains("New Task"));
+    }
+
+    /**
+     * tests retrieval of request URL path info when no path is provided
+     */
+    @Test
+    void getRequestUrlPathInfoNoPath() {
+        when(mockRequest.getPathInfo()).thenReturn(null);
+
+        String result = CommonServletUtility.getRequestUrlPathInfo(mockRequest);
+        assertTrue(result.isEmpty(), "Expected an empty string for null path info");
+    }
+
+    /**
+     * tests retrieval of valid request URL path info
+     */
+    @Test
+    void getRequestUrlPathInfoValidPath() {
+        // sample path info
+        when(mockRequest.getPathInfo()).thenReturn("/12345");
+
+        // converting path info into an array
+        String result = CommonServletUtility.getRequestUrlPathInfo(mockRequest);
+        assertEquals("12345", result, "Expected path info to match");
+    }
+
+    /**
+     * tests conversion of request path information into an array
+     */
+    @Test
+    void getRequestPathInformationDataAsArray() {
+        String pathInfo = "12345/67890";
+        String[] result = CommonServletUtility.getRequestPathInformationDataAsArray(pathInfo);
+
+        // assertions to verify correct parsing
+        assertNotNull(result);
+        assertEquals(2, result.length);
+        assertEquals("12345", result[0]);
+        assertEquals("67890", result[1]);
     }
 }

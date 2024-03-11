@@ -90,4 +90,23 @@ class DataValidationUtilityTest {
         assertThrows(InvalidRequestAttributeValueException.class, () ->
                 DataValidationUtility.validateTaskDescription(null, false));
     }
+
+    /**
+     * tests validation of a valid task ID against the expected format (UUID)
+     */
+    @Test
+    void isValidTaskIdValid() {
+        // example of a valid UUID
+        String validUUID = "123e4567-e89b-12d3-a456-426614174000";
+        assertTrue(DataValidationUtility.isValidTaskId(validUUID), "Should return true for a valid UUID");
+    }
+
+    /**
+     * tests validation of an invalid task ID against the expected format (UUID)
+     */
+    @Test
+    void isValidTaskIdInvalid() {
+        String invalidUUID = "invalid-uuid";
+        assertFalse(DataValidationUtility.isValidTaskId(invalidUUID), "Should return false for an invalid UUID");
+    }
 }
