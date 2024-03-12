@@ -1,5 +1,5 @@
 # Task Manager REST API
-This is a very basic REST API developed using _Java_ to provide an API-based **Task-Management-System**.
+This is a basic Java based REST Application using which an user can ___Create a New Task___, ___View List of All Active Tasks___, ___Find a Particular Task Using It's Corresponding ID___, ___Delete a Task Using It's Corresponding ID___.
 
 ## Development Information
 - Developer:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;[RAJESH SINHA](https://github.com/rajeshsinha1997)
@@ -42,3 +42,15 @@ Below are the endpoints which are available to use,
 4. DELETE /tasks/{task_id}&nbsp;&nbsp;&nbsp;- delete a particular task by it's corresponding id
 
 The [Postman Collection](https://github.com/rajeshsinha1997/task-manager-rest-java/blob/main/tmr/postman_collection/task-manager-rest-api.postman_collection.json) present in the repository contains more detailed information about these endpoints.
+
+## Contribute to the Repository
+
+- Check the [ISSUES](https://github.com/rajeshsinha1997/task-manager-rest-java/issues) section of the repository for any open issue which is available to be picked up, and add a comment informing that you're willing to work on that particular issue. It will be assigned to you. Also, if you have any suggestion or enhancement in mind, which can be implemented then start a discussion on that in the [DISCUSSIONS](https://github.com/rajeshsinha1997/task-manager-rest-java/discussions) section of the repository. After verifying the requirement a new issue will be created.
+
+- Once the issue has been assigned to you, create a separate feature branch for that issue, and implement your changes in that feature branch. Make sure to update the ___Test Cases___, ___Postman Collection___, and the ___README.md___ file accordingly.
+
+- Once you're done with implementing the changes, raise a pull request towards the '**develop**' branch from your feature branch, and wait for code reviews. 
+
+- After the code review, if code review comments have been added to the pull request, go through the comments and make the suggested changes. If you have any thought or suggestions related to the suggested changes, feel free to add those as comments to those suggestions.
+
+- Once the code review is finished, the pull request will be merged to the '**develop**' branch, and will move to the main branch with the next upcoming release. **Once the pull request has been merged to the develop branch, your name will be added as a __contributor__ in the project repository**.
