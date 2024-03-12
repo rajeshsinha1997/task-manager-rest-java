@@ -4,7 +4,6 @@ This is a basic Java based REST Application using which an user can ___Create a 
 ## Repository Status
 [![Build And Publish Docker Image](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/build_and_publish_docker_image.yml/badge.svg?branch=main)](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/build_and_publish_docker_image.yml)\
 [![CodeQL Analysis](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/code_ql_analysis.yml/badge.svg?branch=main)](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/code_ql_analysis.yml)\
-[![Dependency Review](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/dependency_review.yml/badge.svg?branch=main)](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/dependency_review.yml)\
 [![Java CI with Maven](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/maven-test.yml/badge.svg?branch=main)](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/maven-test.yml)
 
 ## Development Information
