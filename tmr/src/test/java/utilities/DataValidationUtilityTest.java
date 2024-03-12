@@ -9,7 +9,7 @@ class DataValidationUtilityTest {
 
     /**
      * tests validation logic to ensure that a null task title is not allowed
-     * and correctly throws an InvalidRequestAttributeValueException.
+     * and correctly throws an InvalidRequestAttributeValueException
      */
     @Test
     void validateNullTitleNotAllowed() {
@@ -19,7 +19,7 @@ class DataValidationUtilityTest {
 
     /**
      * tests validation logic to ensure that an empty task title is not allowed
-     * and correctly throws an InvalidRequestAttributeValueException.
+     * and correctly throws an InvalidRequestAttributeValueException
      */
     @Test
     void validateEmptyTitleNotAllowed() {
@@ -28,12 +28,47 @@ class DataValidationUtilityTest {
     }
 
     /**
-     * validates exception is thrown when task title is blank (whitespace) and not allowed.
+     * validates exception is thrown when task title is blank (whitespace) and not allowed
      */
     @Test
     void validateBlankTitleNotAllowed() {
         assertThrows(InvalidRequestAttributeValueException.class, () ->
                 DataValidationUtility.validateTaskTitle(" ", false));
+    }
+
+    /**
+     * validates that a null task title is permitted and returns null
+     */
+    @Test
+    void validateNullTitleAllowed() {
+        assertNull(DataValidationUtility.validateTaskTitle(null, true));
+    }
+
+    /**
+     * validates that an empty string as a task title is permitted and returns null
+     */
+    @Test
+    void validateEmptyTitleAllowed() {
+        assertNull(DataValidationUtility.validateTaskTitle("", true));
+    }
+
+    /**
+     * validates that a task title containing only whitespace is permitted and returns null
+     */
+    @Test
+    void validateBlankTitleAllowed() {
+        assertNull(DataValidationUtility.validateTaskTitle(" ", true));
+    }
+
+    /**
+     * confirms that whitespace around a valid task title is trimmed
+     */
+    @Test
+    void validateTrimTitle() {
+        String titleWithSpaces = "  Valid Title  ";
+        String expectedTitle = "Valid Title";
+        String result = DataValidationUtility.validateTaskTitle(titleWithSpaces, false);
+        assertEquals(expectedTitle, result, "Should trim the title and return the valid part only.");
     }
 
     /**
@@ -64,7 +99,7 @@ class DataValidationUtilityTest {
     }
 
     /**
-     * validates blank task description is allowed and returns null.
+     * validates blank task description is allowed and returns null
      */
     @Test
     void validateBlankDescriptionAllowed() {
@@ -72,7 +107,7 @@ class DataValidationUtilityTest {
     }
 
     /**
-     * validates a valid task description is accepted and returned trimmed.
+     * validates a valid task description is accepted and returned trimmed
      */
     @Test
     void validateValidDescription() {
@@ -83,7 +118,7 @@ class DataValidationUtilityTest {
     }
 
     /**
-     * validates exception is thrown when task description is null and not allowed.
+     * validates exception is thrown when task description is null and not allowed
      */
     @Test
     void validateNullDescriptionNotAllowed() {

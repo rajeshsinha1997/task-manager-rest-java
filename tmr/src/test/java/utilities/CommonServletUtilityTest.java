@@ -54,7 +54,7 @@ class CommonServletUtilityTest {
     }
 
     /**
-     * tests exception throwing for malformed JSON input.
+     * tests exception throwing for malformed JSON input
      */
     @Test
     void malformedJsonException() {
@@ -74,7 +74,7 @@ class CommonServletUtilityTest {
     }
 
     /**
-     * tests error response building.
+     * tests error response building
      */
     @Test
     void buildErrorResponse() {
@@ -85,7 +85,7 @@ class CommonServletUtilityTest {
     }
 
     /**
-     * tests success response building.
+     * tests success response building
      */
     @Test
     void buildSuccessResponse() {
@@ -103,6 +103,20 @@ class CommonServletUtilityTest {
     }
 
     /**
+     * verifies buildErrorResponse when an IOException occurs
+     */
+    @Test
+    void buildErrorResponseIOException() throws IOException {
+        Throwable error = new RuntimeException("Error occurred");
+        when(mockResponse.getWriter()).thenThrow(IOException.class);
+
+        CommonServletUtility.buildErrorResponse(mockResponse, HttpServletResponse.SC_BAD_REQUEST, error);
+
+        // assert
+        verify(mockResponse).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+    /**
      * tests retrieval of request URL path info when no path is provided
      */
     @Test
@@ -111,6 +125,24 @@ class CommonServletUtilityTest {
 
         String result = CommonServletUtility.getRequestUrlPathInfo(mockRequest);
         assertTrue(result.isEmpty(), "Expected an empty string for null path info");
+    }
+
+    /**
+     * verifies that getRequestUrlPathInfo method trims leading and trailing slashes
+     */
+    @Test
+    void getRequestUrlPathInfoTrimSlashes() {
+        // test with leading slash
+        when(mockRequest.getPathInfo()).thenReturn("/test");
+        assertEquals("test", CommonServletUtility.getRequestUrlPathInfo(mockRequest), "Should trim leading slash");
+
+        // test with trailing slash
+        when(mockRequest.getPathInfo()).thenReturn("test/");
+        assertEquals("test", CommonServletUtility.getRequestUrlPathInfo(mockRequest), "Should trim trailing slash");
+
+        // test with leading and trailing slash
+        when(mockRequest.getPathInfo()).thenReturn("/test/");
+        assertEquals("test", CommonServletUtility.getRequestUrlPathInfo(mockRequest), "Should trim leading and trailing slash");
     }
 
     /**
@@ -139,5 +171,24 @@ class CommonServletUtilityTest {
         assertEquals(2, result.length);
         assertEquals("12345", result[0]);
         assertEquals("67890", result[1]);
+    }
+
+    /**
+     * verifies that the getRequestUrlPathInfo method returns the correct string
+     * when the path info contains multiple sections
+     */
+    @Test
+    void getRequestUrlPathInfoMultipleSections() {
+        when(mockRequest.getPathInfo()).thenReturn("/section1/section2/section3");
+        assertEquals("section1/section2/section3", CommonServletUtility.getRequestUrlPathInfo(mockRequest), "Should return correct path info with multiple sections");
+    }
+
+    /**
+     * verifies that getRequestUrlPathInfo does not alter a path info that is already correct
+     */
+    @Test
+    void getRequestUrlPathInfoCorrectPath() {
+        when(mockRequest.getPathInfo()).thenReturn("test/path");
+        assertEquals("test/path", CommonServletUtility.getRequestUrlPathInfo(mockRequest), "Should not alter correct path info");
     }
 }
