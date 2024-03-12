@@ -1,6 +1,12 @@
 # Task Manager REST API
 This is a basic Java based REST Application using which an user can ___Create a New Task___, ___View List of All Active Tasks___, ___Find a Particular Task Using It's Corresponding ID___, ___Delete a Task Using It's Corresponding ID___.
 
+## Repository Status
+[![Build And Publish Docker Image](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/build_and_publish_docker_image.yml/badge.svg?branch=main)](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/build_and_publish_docker_image.yml)\
+[![CodeQL Analysis](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/code_ql_analysis.yml/badge.svg?branch=main)](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/code_ql_analysis.yml)\
+[![Dependency Review](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/dependency_review.yml/badge.svg?branch=main)](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/dependency_review.yml)\
+[![Java CI with Maven](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/maven-test.yml/badge.svg?branch=main)](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/maven-test.yml)
+
 ## Development Information
 - Developer:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;[RAJESH SINHA](https://github.com/rajeshsinha1997)
 - Development Language:&emsp;Java
@@ -22,7 +28,7 @@ mvn clean install
 6. Now you can send the HTTP requests which are already added in the postman collection present in the repository. Make sure to update the PORT value in the postman request URLs (___if you're using any PORT value other than 8080___) before sending any request.
 
 ## Steps to Setup Project In Local System With Docker
-1. Pull the docker image for the current project from Docker Hub using the below command (make sure to replace the '**<version_number>**' with the corresponding available version of your choice),
+1. Pull the docker image from Docker Hub using the below command (make sure to replace the '**<version_number>**' with the corresponding available version of your choice),
 ```
 docker pull rajeshsinha1997/task-manager-rest-api:<version_number>
 ```
