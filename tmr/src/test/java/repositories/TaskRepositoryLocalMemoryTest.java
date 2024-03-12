@@ -76,20 +76,22 @@ class TaskRepositoryLocalMemoryTest {
     }
 
     /**
-     * tests retrieving a deleted task should return null
+     * tests that findTaskById returns null for both non-existent and deleted tasks
      */
     @Test
-    void getDeletedIsNull() {
-        // adding and then deleting a task from the repository
-        String taskId = "3";
-        TaskModel task = new TaskModel(taskId, "Task 3", "Description 3", "12-10-2023", "13-10-2023", false, false);
+    void findTaskByIdNullIfNotPresent() {
+        // attempt to retrieve a non-existent task should return null
+        String nonExistentTaskId = "non-existent";
+        assertNull(repository.findTaskById(nonExistentTaskId), "Retrieving a non-existent task should return null.");
+
+        // add a task and then mark it as deleted
+        String taskId = "1";
+        TaskModel task = new TaskModel(taskId, "Task 1", "Description 1", "10-10-2023", "10-10-2023", false, false);
         repository.addNewTask(task);
         repository.deleteTaskById(taskId);
 
-        // attempting to retrieve the deleted task
+        // attempt to retrieve the deleted task by ID should return null
         TaskModel deletedTask = repository.findTaskById(taskId);
-
-        // asserting that the task cannot be found and is therefore null
-        assertNull(deletedTask, "Retrieved task after deletion should be null.");
+        assertNull(deletedTask, "Retrieving a deleted task should return null.");
     }
 }

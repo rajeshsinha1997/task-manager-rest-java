@@ -99,15 +99,19 @@ class TaskServiceTest {
         verify(taskRepository, times(1)).findAllTasks();
     }
 
-
     /**
      * ensures exception thrown for invalid task data.
      */
     @Test
     void createTaskInvalidData() {
-        TaskPostRequestDTO requestDTO = new TaskPostRequestDTO("", "");
+        // test with null DTO
+        assertThrows(InvalidRequestAttributeValueException.class, () -> taskService.createNewTask(null));
 
-        assertThrows(InvalidRequestAttributeValueException.class, () -> taskService.createNewTask(requestDTO));
+        // test with DTO having empty values
+        TaskPostRequestDTO requestDTOWithEmptyValues = new TaskPostRequestDTO("", "");
+        assertThrows(InvalidRequestAttributeValueException.class, () -> taskService.createNewTask(requestDTOWithEmptyValues));
+
+        // verify that addNewTask was never called as the method should throw an exception before that
         verify(taskRepository, never()).addNewTask(any(TaskModel.class));
     }
 
@@ -139,7 +143,6 @@ class TaskServiceTest {
         verify(taskRepository, atLeast(2)).findTaskById(anyString());
         verify(taskRepository).addNewTask(argThat(task -> task.getTaskId().equals(responseDTO.getTaskId())));
     }
-
 
     /**
      * tests that getTaskById returns the correct task
@@ -185,6 +188,17 @@ class TaskServiceTest {
         verify(taskRepository, times(1)).findTaskById(nonExistingTaskId);
     }
 
+    /**
+     * tests that getTaskById throws an InvalidRequestAttributeValueException for an invalid task ID
+     */
+    @Test
+    void getTaskByInvalidIdThrowsException() {
+        String invalidTaskId = "invalid-id"; // assuming this ID will fail validation
+
+        // attempt to retrieve the task and verify that the correct exception is thrown with the expected message
+        Exception exception = assertThrows(InvalidRequestAttributeValueException.class, () -> taskService.getTaskById(invalidTaskId));
+        assertEquals("INVALID TASK ID: " + invalidTaskId, exception.getMessage());
+    }
 
     /**
      * tests that deleteTaskById successfully removes a task
@@ -225,5 +239,20 @@ class TaskServiceTest {
         // verify that findTaskById was called but NOT deleteTaskById since the task does not exist
         verify(taskRepository, times(1)).findTaskById(nonExistingTaskId);
         verify(taskRepository, never()).deleteTaskById(nonExistingTaskId);
+    }
+
+    /**
+     * tests that deleteTaskById throws an InvalidRequestAttributeValueException for an invalid task ID
+     */
+    @Test
+    void deleteTaskByInvalidIdThrowsException() {
+        String invalidTaskId = "invalid-id"; // use an ID known to fail the validation logic
+
+        // attempt to delete the task and verify that the correct exception is thrown
+        Exception exception = assertThrows(InvalidRequestAttributeValueException.class, () -> taskService.deleteTaskById(invalidTaskId));
+        assertEquals("INVALID TASK ID: " + invalidTaskId, exception.getMessage());
+
+        // verify that deleteTaskById was not called because the exception
+        verify(taskRepository, never()).deleteTaskById(anyString());
     }
 }
