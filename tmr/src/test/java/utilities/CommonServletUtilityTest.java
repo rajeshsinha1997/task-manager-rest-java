@@ -7,15 +7,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class CommonServletUtilityTest {
 
     @Mock
@@ -28,9 +30,8 @@ class CommonServletUtilityTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        MockitoAnnotations.initMocks(this);
         responseWriter = new StringWriter();
-        when(mockResponse.getWriter()).thenReturn(new PrintWriter(responseWriter));
+        lenient().when(mockResponse.getWriter()).thenReturn(new PrintWriter(responseWriter));
     }
 
     /**

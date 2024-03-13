@@ -6,9 +6,11 @@ import exceptions.InvalidRequestAttributeValueException;
 import models.TaskModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import repositories.ITaskRepository;
 import utilities.CommonUtility;
 
@@ -20,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
+@ExtendWith(MockitoExtension.class)
 class TaskServiceTest {
 
     @Mock
@@ -28,10 +31,6 @@ class TaskServiceTest {
     @InjectMocks
     private TaskService taskService;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
-    }
 
     /**
      * verifies successful task creation with provided details
