@@ -18,7 +18,7 @@ class TaskRepositoryLocalMemoryTest {
     }
 
     /**
-     * tests adding a new task and retrieving it by ID.
+     * tests adding a new task and retrieving it by ID
      */
     @Test
     void addAndGetById() {

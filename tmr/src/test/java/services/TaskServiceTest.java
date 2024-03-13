@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+
 class TaskServiceTest {
 
     @Mock
@@ -33,7 +34,7 @@ class TaskServiceTest {
     }
 
     /**
-     * verifies successful task creation with provided details.
+     * verifies successful task creation with provided details
      */
     @Test
     void createNewTask() {
@@ -72,7 +73,7 @@ class TaskServiceTest {
     }
 
     /**
-     * tests retrieval of all tasks.
+     * tests retrieval of all tasks
      */
     @Test
     void getAllTasks() {
@@ -100,7 +101,7 @@ class TaskServiceTest {
     }
 
     /**
-     * ensures exception thrown for invalid task data.
+     * ensures exception thrown for invalid task data
      */
     @Test
     void createTaskInvalidData() {
@@ -116,7 +117,7 @@ class TaskServiceTest {
     }
 
     /**
-     * verifies task ID uniqueness during creation.
+     * verifies task ID uniqueness during creation
      */
     @Test
     void createTaskUniqueID() {
@@ -192,7 +193,7 @@ class TaskServiceTest {
      * tests that getTaskById throws an InvalidRequestAttributeValueException for an invalid task ID
      */
     @Test
-    void getTaskByInvalidIdThrowsException() {
+    void getTaskByInvalidId() {
         String invalidTaskId = "invalid-id"; // assuming this ID will fail validation
 
         // attempt to retrieve the task and verify that the correct exception is thrown with the expected message
@@ -226,11 +227,9 @@ class TaskServiceTest {
     @Test
     void deleteNonExisting() {
         String nonExistingTaskId = UUID.randomUUID().toString();
-
-        // mock taskRepository.findTaskById to return null indicating the task does not exist
         when(taskRepository.findTaskById(nonExistingTaskId)).thenReturn(null);
 
-        // execute the method under test and verify that the expected exception is thrown
+        // verify that the expected exception is thrown
         Exception exception = assertThrows(InvalidRequestAttributeValueException.class, () -> taskService.deleteTaskById(nonExistingTaskId));
 
         // verify that the message of the exception is as expected
@@ -245,7 +244,7 @@ class TaskServiceTest {
      * tests that deleteTaskById throws an InvalidRequestAttributeValueException for an invalid task ID
      */
     @Test
-    void deleteTaskByInvalidIdThrowsException() {
+    void deleteTaskByInvalidId() {
         String invalidTaskId = "invalid-id"; // use an ID known to fail the validation logic
 
         // attempt to delete the task and verify that the correct exception is thrown

@@ -2,6 +2,7 @@ package controllers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import dtos.generic.GenericErrorResponseDTO;
 import dtos.generic.GenericResponseDTO;
@@ -13,14 +14,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import services.TaskService;
+import utilities.CommonServletUtility;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static jakarta.servlet.http.HttpServletResponse.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -55,7 +56,7 @@ class TaskServletTest {
         responseMock = mock(HttpServletResponse.class);
         responseWriter = new StringWriter();
 
-        // injects the TaskService mock into the servlet using reflection.
+        // injects the TaskService mock into the servlet using reflection
         Field taskServiceField = TaskServlet.class.getDeclaredField("taskService");
         taskServiceField.setAccessible(true);
         taskServiceField.set(servlet, taskServiceMock);
@@ -64,7 +65,7 @@ class TaskServletTest {
     }
 
     /**
-     * tests the doGet method to ensure it properly handles GET requests and interacts with the TaskService.
+     * tests the doGet method to ensure it properly handles GET requests
      */
     @Test
     void doGet() throws ServletException {
@@ -78,11 +79,11 @@ class TaskServletTest {
     }
 
     /**
-     * tests the doGet method to check it returns a success response with task data.
+     * tests the doGet method to check it returns a success response with task data
      */
     @Test
     void getWithSuccess() throws Exception {
-        List<TaskDataResponseDTO> tasks = List.of(new TaskDataResponseDTO("1", "T1", "Descripción 1", "D1"));
+        List<TaskDataResponseDTO> tasks = List.of(new TaskDataResponseDTO("1", "T1", "Description 1", "D1"));
         when(taskServiceMock.getAllTasks()).thenReturn(tasks);
 
         servlet.doGet(requestMock, responseMock);
@@ -100,7 +101,58 @@ class TaskServletTest {
     }
 
     /**
-     * tests the doPost method to ensure it correctly handles POST requests by creating new tasks.
+     *  tests handling GET request with a specific task ID, expecting a successful response
+     */
+    @Test
+    void getByIdSuccess() throws Exception {
+        String taskId = "existing-id";
+        TaskDataResponseDTO task = new TaskDataResponseDTO(taskId, "Title", "Description", "CreatedOn");
+        when(taskServiceMock.getTaskById(taskId)).thenReturn(task);
+
+        // mocking the request
+        when(requestMock.getPathInfo()).thenReturn("/" + taskId);
+
+        servlet.doGet(requestMock, responseMock);
+
+        // verifying the success status
+        verify(responseMock).setStatus(HttpServletResponse.SC_OK);
+    }
+
+    /**
+     * tests handling GET request with invalid URL, expecting a 404 response
+     */
+    @Test
+    void getInvalidUrl() throws Exception {
+        // simulating a request
+        when(requestMock.getPathInfo()).thenReturn("/invalid/url");
+
+        servlet.doGet(requestMock, responseMock);
+
+        // verifying that a 404 status is correctly set for invalid URLs
+        verify(responseMock).setStatus(SC_NOT_FOUND);
+    }
+
+    /**
+     * tests handling of an invalid task ID during a GET request
+     */
+    @Test
+    void doGetInvalidAttributeThrowsException() throws ServletException {
+        // assume the request path info is an invalid task ID
+        String invalidTaskId = "invalid-id";
+        when(CommonServletUtility.getRequestUrlPathInfo(requestMock)).thenReturn("/" + invalidTaskId);
+
+        // simulate that taskService.getTaskById will throw an exception when passed an invalid ID
+        when(taskServiceMock.getTaskById(invalidTaskId)).thenThrow(new InvalidRequestAttributeValueException("Invalid task ID"));
+
+        // execute doGet
+        servlet.doGet(requestMock, responseMock);
+
+        // verify that the correct response status code has been set
+        verify(responseMock).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+    /**
+     * tests the doPost method to ensure it correctly handles POST requests by creating new tasks
      */
     @Test
     void doPost() throws ServletException, IOException {
@@ -116,7 +168,7 @@ class TaskServletTest {
     }
 
     /**
-     * tests doPost method handling invalid request data and responding with error.
+     * tests doPost method handling invalid request data and responding with error
      */
     @Test
     void doPostInvalidRequest() throws ServletException, IOException {
@@ -141,7 +193,27 @@ class TaskServletTest {
     }
 
     /**
-     * tests doPost method's error handling for JsonIOException.
+     * tests handling of malformed JSON in POST requests, expecting a 400 response
+     */
+    @Test
+    void doPostWithJsonSyntaxException() throws ServletException, IOException {
+        // simulate a malformed JSON body that will cause a JsonSyntaxException
+        String jsonData = "{\"task-title\": \"Task Title\", \"task-description\":";
+        BufferedReader reader = new BufferedReader(new StringReader(jsonData));
+        when(requestMock.getReader()).thenReturn(reader);
+
+        // simulate a JsonSyntaxException being thrown when processing the request body
+        doThrow(new JsonSyntaxException("Malformed JSON")).when(taskServiceMock).createNewTask(any());
+
+        // execute doPost
+        servlet.doPost(requestMock, responseMock);
+
+        // verify that the response status code has been set to SC_BAD_REQUEST
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
+    }
+
+    /**
+     * tests doPost method's error handling for JsonIOException
      */
     @Test
     void doPostWithJsonIOException() throws IOException, ServletException {
@@ -155,20 +227,33 @@ class TaskServletTest {
     }
 
     /**
-     *  tests handling GET request with a specific task ID, expecting a successful response
+     * tests handling POST request with invalid URL, expecting a 404 response
      */
     @Test
-    void getByIdSuccess() throws Exception {
-        String taskId = "existing-id";
-        TaskDataResponseDTO task = new TaskDataResponseDTO(taskId, "Title", "Description", "CreatedOn");
-        when(taskServiceMock.getTaskById(taskId)).thenReturn(task);
+    void postInvalidUrl() throws Exception {
+        // simulating a POST request
+        when(requestMock.getPathInfo()).thenReturn("/some/unexpected/path");
 
-        // mocking the request
-        when(requestMock.getPathInfo()).thenReturn("/" + taskId);
+        servlet.doPost(requestMock, responseMock);
 
-        servlet.doGet(requestMock, responseMock);
+        // ensuring that a 404 status is set
+        verify(responseMock).setStatus(SC_NOT_FOUND);
+    }
 
-        // verifying the success status
+    /**
+     * tests deletion with a valid task ID, expecting a successful response
+     */
+    @Test
+    void doDeleteValidTask() throws ServletException, IOException {
+        // assume a valid task ID is provided in the path info
+        String validTaskId = "valid-task-id";
+        when(CommonServletUtility.getRequestUrlPathInfo(requestMock)).thenReturn("/" + validTaskId);
+        servlet.doDelete(requestMock, responseMock);
+
+        // verify that the deleteTaskById method of the taskService is called with the correct task ID
+        verify(taskServiceMock).deleteTaskById(validTaskId);
+
+        // verify that the correct response status code has been set
         verify(responseMock).setStatus(HttpServletResponse.SC_OK);
     }
 
@@ -191,30 +276,49 @@ class TaskServletTest {
     }
 
     /**
-     * tests handling GET request with invalid URL, expecting a 404 response
+     * tests deletion without path info, expecting a BAD_REQUEST response
      */
     @Test
-    void getInvalidUrl() throws Exception {
-        // simulating a request
-        when(requestMock.getPathInfo()).thenReturn("/invalid/url");
+    void deleteNoPathInfoTest() throws ServletException, IOException {
+        // Simulate no path information
+        when(requestMock.getPathInfo()).thenReturn("");
+        servlet.doDelete(requestMock, responseMock);
 
-        servlet.doGet(requestMock, responseMock);
-
-        // verifying that a 404 status is correctly set for invalid URLs
-        verify(responseMock).setStatus(HttpServletResponse.SC_NOT_FOUND);
+        // verify that the correct response status code has been set to SC_BAD_REQUEST
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
+        assertTrue(responseWriter.toString().contains("A VALID TASK ID WAS NOT PROVIDED"));
     }
 
     /**
-     * tests handling POST request with invalid URL, expecting a 404 response
+     * tests deletion with extra path segments, expecting a NOT_FOUND response
      */
     @Test
-    void postInvalidUrl() throws Exception {
-        // simulating a POST request
-        when(requestMock.getPathInfo()).thenReturn("/some/unexpected/path");
+    void deleteExtraPathSegmentsTest() throws ServletException, IOException {
+        // simulate path information
+        when(requestMock.getPathInfo()).thenReturn("/task-id/additional-segment");
+        servlet.doDelete(requestMock, responseMock);
 
-        servlet.doPost(requestMock, responseMock);
+        // verify that the correct response status code has been set to SC_NOT_FOUND
+        verify(responseMock).setStatus(SC_NOT_FOUND);
 
-        // ensuring that a 404 status is set
+        assertTrue(responseWriter.toString().contains("THE REQUESTED RESOURCE IS NOT AVAILABLE YET"));
+    }
+
+    /**
+     * tests deletion with an invalid URL, expecting a 404 error response
+     */
+    @Test
+    void deleteInvalidUrlTest() throws Exception {
+        // set up mock to simulate an invalid URL
+        when(CommonServletUtility.getRequestUrlPathInfo(requestMock)).thenReturn("/invalid/url/extra/segment");
+        servlet.doDelete(requestMock, responseMock);
+
+        // verify that the response has the HTTP 404 status
         verify(responseMock).setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+        // verify that buildErrorResponse is called with the correct status and exception
+        verify(responseMock).getWriter(); //
+        String responseContent = responseWriter.toString();
+        assertTrue(responseContent.contains("THE REQUESTED RESOURCE IS NOT AVAILABLE YET"));
     }
 }
