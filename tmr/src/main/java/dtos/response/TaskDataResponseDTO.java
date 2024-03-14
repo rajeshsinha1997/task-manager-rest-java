@@ -14,7 +14,7 @@ public class TaskDataResponseDTO {
     private String taskDescription;
 
     @SerializedName("task-completed")
-    private boolean isTaskCompleted;
+    private Boolean isTaskCompleted;
 
     @SerializedName("task-created-on")
     private String taskCreatedOn;
@@ -30,7 +30,7 @@ public class TaskDataResponseDTO {
      * @param taskCreatedOn   - date and timestamp as String on which the task was
      *                        created
      */
-    public TaskDataResponseDTO(String taskId, String taskTitle, String taskDescription, boolean isTaskCompleted,
+    public TaskDataResponseDTO(String taskId, String taskTitle, String taskDescription, Boolean isTaskCompleted,
             String taskCreatedOn) {
         // initialize the attributes of the dto object
         this.taskId = taskId;
@@ -64,11 +64,11 @@ public class TaskDataResponseDTO {
         this.taskDescription = taskDescription;
     }
 
-    public boolean isTaskCompleted() {
+    public Boolean isTaskCompleted() {
         return isTaskCompleted;
     }
 
-    public void setTaskCompleted(boolean isTaskCompleted) {
+    public void setTaskCompleted(Boolean isTaskCompleted) {
         this.isTaskCompleted = isTaskCompleted;
     }
 

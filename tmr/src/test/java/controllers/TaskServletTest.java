@@ -83,7 +83,7 @@ class TaskServletTest {
      */
     @Test
     void getWithSuccess() throws Exception {
-        List<TaskDataResponseDTO> tasks = List.of(new TaskDataResponseDTO("1", "T1", "Description 1", "D1"));
+        List<TaskDataResponseDTO> tasks = List.of(new TaskDataResponseDTO("1", "T1", "Description 1", false, "D1"));
         when(taskServiceMock.getAllTasks()).thenReturn(tasks);
 
         servlet.doGet(requestMock, responseMock);
@@ -91,8 +91,10 @@ class TaskServletTest {
         // checking for correct response
         verify(responseMock).setStatus(HttpServletResponse.SC_OK);
 
-        Type responseType = new TypeToken<GenericResponseDTO<List<TaskDataResponseDTO>>>(){}.getType();
-        GenericResponseDTO<List<TaskDataResponseDTO>> successResponse = new Gson().fromJson(responseWriter.toString(), responseType);
+        Type responseType = new TypeToken<GenericResponseDTO<List<TaskDataResponseDTO>>>() {
+        }.getType();
+        GenericResponseDTO<List<TaskDataResponseDTO>> successResponse = new Gson().fromJson(responseWriter.toString(),
+                responseType);
 
         // assert
         assertNotNull(successResponse);
@@ -101,12 +103,13 @@ class TaskServletTest {
     }
 
     /**
-     *  tests handling GET request with a specific task ID, expecting a successful response
+     * tests handling GET request with a specific task ID, expecting a successful
+     * response
      */
     @Test
     void getByIdSuccess() throws Exception {
         String taskId = "existing-id";
-        TaskDataResponseDTO task = new TaskDataResponseDTO(taskId, "Title", "Description", "CreatedOn");
+        TaskDataResponseDTO task = new TaskDataResponseDTO(taskId, "Title", "Description", false, "CreatedOn");
         when(taskServiceMock.getTaskById(taskId)).thenReturn(task);
 
         // mocking the request
@@ -141,8 +144,10 @@ class TaskServletTest {
         String invalidTaskId = "invalid-id";
         when(CommonServletUtility.getRequestUrlPathInfo(requestMock)).thenReturn("/" + invalidTaskId);
 
-        // simulate that taskService.getTaskById will throw an exception when passed an invalid ID
-        when(taskServiceMock.getTaskById(invalidTaskId)).thenThrow(new InvalidRequestAttributeValueException("Invalid task ID"));
+        // simulate that taskService.getTaskById will throw an exception when passed an
+        // invalid ID
+        when(taskServiceMock.getTaskById(invalidTaskId))
+                .thenThrow(new InvalidRequestAttributeValueException("Invalid task ID"));
 
         // execute doGet
         servlet.doGet(requestMock, responseMock);
@@ -152,7 +157,8 @@ class TaskServletTest {
     }
 
     /**
-     * tests the doPost method to ensure it correctly handles POST requests by creating new tasks
+     * tests the doPost method to ensure it correctly handles POST requests by
+     * creating new tasks
      */
     @Test
     void doPost() throws ServletException, IOException {
@@ -177,7 +183,8 @@ class TaskServletTest {
         when(requestMock.getReader()).thenReturn(reader);
 
         // simulating an exception
-        doThrow(new InvalidRequestAttributeValueException("Invalid task title")).when(taskServiceMock).createNewTask(any());
+        doThrow(new InvalidRequestAttributeValueException("Invalid task title")).when(taskServiceMock)
+                .createNewTask(any());
 
         servlet.doPost(requestMock, responseMock);
 
@@ -250,7 +257,8 @@ class TaskServletTest {
         when(CommonServletUtility.getRequestUrlPathInfo(requestMock)).thenReturn("/" + validTaskId);
         servlet.doDelete(requestMock, responseMock);
 
-        // verify that the deleteTaskById method of the taskService is called with the correct task ID
+        // verify that the deleteTaskById method of the taskService is called with the
+        // correct task ID
         verify(taskServiceMock).deleteTaskById(validTaskId);
 
         // verify that the correct response status code has been set
@@ -258,14 +266,16 @@ class TaskServletTest {
     }
 
     /**
-     * tests handling DELETE request for a non-existing task ID, expecting an error response
+     * tests handling DELETE request for a non-existing task ID, expecting an error
+     * response
      */
     @Test
     void deleteNotFound() throws Exception {
         String nonExistingTaskId = "non-existing-id";
 
         // simulating an exception
-        doThrow(new InvalidRequestAttributeValueException("No task found with given ID")).when(taskServiceMock).deleteTaskById(nonExistingTaskId);
+        doThrow(new InvalidRequestAttributeValueException("No task found with given ID")).when(taskServiceMock)
+                .deleteTaskById(nonExistingTaskId);
 
         when(requestMock.getPathInfo()).thenReturn("/" + nonExistingTaskId);
 
@@ -316,7 +326,8 @@ class TaskServletTest {
         // verify that the response has the HTTP 404 status
         verify(responseMock).setStatus(HttpServletResponse.SC_NOT_FOUND);
 
-        // verify that buildErrorResponse is called with the correct status and exception
+        // verify that buildErrorResponse is called with the correct status and
+        // exception
         verify(responseMock).getWriter(); //
         String responseContent = responseWriter.toString();
         assertTrue(responseContent.contains("THE REQUESTED RESOURCE IS NOT AVAILABLE YET"));
