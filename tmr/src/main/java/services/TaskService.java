@@ -155,6 +155,12 @@ public class TaskService {
      */
     public TaskDataResponseDTO updateTaskById(String taskId, TaskPatchRequestDTO updatedTaskData)
             throws InvalidRequestAttributeValueException {
+        // check if the instance of the dto is null, i.e. no request body was provided
+        if (updatedTaskData == null) {
+            // throw appropriate exception
+            throw new InvalidRequestAttributeValueException("AN EMPTY REQUEST BODY IS NOT VALID");
+        }
+
         // check if the given task id is valid
         if (DataValidationUtility.isValidTaskId(taskId)) {
             // fetch the existing task object with the given id
