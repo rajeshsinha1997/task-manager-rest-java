@@ -4,6 +4,7 @@ import java.io.IOException;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import dtos.request.TaskPatchRequestDTO;
 import dtos.request.TaskPostRequestDTO;
 import dtos.response.TaskDataResponseDTO;
 import exceptions.InvalidRequestAttributeValueException;
@@ -141,6 +142,83 @@ public class TaskServlet extends HttpServlet {
         } catch (InvalidRequestUrlException e) {
             // build error response with status code as 404
             CommonServletUtility.buildErrorResponse(resp, 404, e);
+        }
+    }
+
+    /**
+     * method to process PATCH requests and build corresponding response
+     * 
+     * @param req  - instance of HttpServletRequest class
+     * @param resp - instance of HttpServletResponse class
+     */
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            // get request path information
+            String requestPathInformation = CommonServletUtility.getRequestUrlPathInfo(req);
+
+            // check if no path information is provided along with the request
+            if (requestPathInformation.isBlank()) {
+                // throw corresponding exception
+                throw new InvalidRequestAttributeValueException("A VALID TASK ID WAS NOT PROVIDED");
+            }
+
+            // get path information data array
+            String[] pathInformationDataArray = CommonServletUtility
+                    .getRequestPathInformationDataAsArray(requestPathInformation);
+
+            // check if the path information data array contains more than one element
+            if (pathInformationDataArray.length > 1) {
+                // throw corresponding exception
+                throw new InvalidRequestUrlException("THE REQUESTED RESOURCE IS NOT AVAILABLE YET");
+            }
+
+            // get mapped request body
+            TaskPatchRequestDTO patchRequestDTO = CommonServletUtility.mapRequestBodyToObject(req,
+                    TaskPatchRequestDTO.class);
+
+            // call service method to update the existing task with the given id and build
+            // success response with the updated task object data
+            CommonServletUtility.buildSuccessResponse(resp, 200,
+                    this.taskService.updateTaskById(pathInformationDataArray[0], patchRequestDTO));
+        } catch (JsonSyntaxException | JsonIOException | IOException
+                | InvalidRequestAttributeValueException | InvalidRequestUrlException e) {
+            // check if the exception object is an instance of
+            // InvalidRequestAttributeValueException or JsonSyntaxException
+            if (e instanceof InvalidRequestAttributeValueException || e instanceof JsonSyntaxException) {
+                // build error response with status code as 400
+                CommonServletUtility.buildErrorResponse(resp, 400, e);
+            }
+            // else check if the exception object is an instance of
+            // InvalidRequestUrlException
+            else if (e instanceof InvalidRequestUrlException) {
+                // build error response with status code as 404
+                CommonServletUtility.buildErrorResponse(resp, 404, e);
+            }
+            // else build error response with status code as 500
+            else {
+                CommonServletUtility.buildErrorResponse(resp, 500, e);
+            }
+        }
+    }
+
+    @Override
+    /**
+     * override the service method of HttpServlet class so that we can forward any
+     * PATCH request to our own custom implementation of the PATCH endpoint. For
+     * rest of the request methods we will call the super method of HttpServlet
+     * class, which will handle the processing afterwards.
+     */
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // get request method name
+        String requestMethod = req.getMethod();
+
+        // check if the request method name is PATCH
+        if (requestMethod.equals("PATCH")) {
+            // make call to the custom implemented PATCH method
+            this.doPatch(req, resp);
+        } else {
+            // make call to the service method of HttpServlet class
+            super.service(req, resp);
         }
     }
 

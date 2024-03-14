@@ -8,8 +8,10 @@ import com.google.gson.JsonSyntaxException;
 
 import dtos.generic.GenericErrorResponseDTO;
 import dtos.generic.GenericResponseDTO;
+import dtos.response.TaskDataResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import models.TaskModel;
 
 public class CommonServletUtility {
 
@@ -143,5 +145,20 @@ public class CommonServletUtility {
         // create and return the string array by splitting the request path information
         // data by '/'
         return requestPathInformationData.split("/");
+    }
+
+    /**
+     * method to create and return an instance of TaskDataResponseDTO from the task
+     * record as an instance of TaskModel
+     * 
+     * @param taskData - an instance of TaskModel
+     * @return an instance of TaskDataResponseDTO
+     */
+    public static TaskDataResponseDTO buildTaskResponseObject(TaskModel taskData) {
+        // create a new instance of TaskDataResponseDTO and return it after populating
+        // the required data
+        return new TaskDataResponseDTO(taskData.getTaskId(), taskData.getTaskTitle(), taskData.getTaskDescription(),
+                taskData.isTaskCompleted(),
+                taskData.getTaskCreatedOn());
     }
 }

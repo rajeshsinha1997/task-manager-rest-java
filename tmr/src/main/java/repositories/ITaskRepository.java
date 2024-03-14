@@ -33,4 +33,12 @@ public interface ITaskRepository {
      * @param taskId - id of the existing task object to delete
      */
     public void deleteTaskById(String taskId);
+
+    /**
+     * method to update an existing task record by it's corresponding id
+     * 
+     * @param taskId          - id of the existing task record to be updated
+     * @param updatedTaskData - updated task record
+     */
+    public void updateTaskById(String taskId, TaskModel updatedTaskData);
 }
