@@ -3,7 +3,8 @@ package services;
 import dtos.request.TaskPatchRequestDTO;
 import dtos.request.TaskPostRequestDTO;
 import dtos.response.TaskDataResponseDTO;
-import exceptions.InvalidRequestAttributeValueException;
+import exceptions.BadRequestException;
+import exceptions.ResourceNotFoundException;
 import models.TaskModel;
 import repositories.ITaskRepository;
 import repositories.TaskRepositoryLocalMemory;
@@ -29,7 +30,7 @@ public class TaskService {
         // call repository method to get list of all available tasks and return after
         // mapping the list items to the required result DTO type
         return this.taskRepository.findAllTasks().stream()
-                .map(taskModel -> CommonServletUtility.buildTaskResponseObject(taskModel))
+                .map(CommonServletUtility::buildTaskResponseObject)
                 .collect(Collectors.toList());
     }
 
@@ -38,12 +39,13 @@ public class TaskService {
      * 
      * @param newTaskToBeCreated - dto instance containing data of the new task to
      *                           be created
+     * @throws BadRequestException - if no POST request body has been provided
      */
     public TaskDataResponseDTO createNewTask(TaskPostRequestDTO newTaskToBeCreated) {
         // check if the instance of the dto is null, i.e. no request body was provided
         if (newTaskToBeCreated == null) {
             // throw appropriate exception
-            throw new InvalidRequestAttributeValueException("AN EMPTY REQUEST BODY IS NOT VALID");
+            throw new BadRequestException("AN EMPTY REQUEST BODY IS NOT VALID");
         }
 
         // validate new task data
@@ -86,10 +88,10 @@ public class TaskService {
      * @param taskId - id value to use to find the expected task object
      * @return an instance of TaskDataResponseDTO if a task object found with the
      *         given id
-     * @throws InvalidRequestAttributeValueException - if no task object found with
-     *                                               the given task id
-     * @throws InvalidRequestAttributeValueException - if the given task id is
-     *                                               invalid
+     * @throws ResourceNotFoundException - if no task object found with
+     *                                   the given task id
+     * @throws BadRequestException       - if the given task id is
+     *                                   invalid
      */
     public TaskDataResponseDTO getTaskById(String taskId) {
         // check if the given task id is valid
@@ -100,14 +102,14 @@ public class TaskService {
             // check if the existing task object is null
             if (existingTask == null) {
                 // throw corresponding exception
-                throw new InvalidRequestAttributeValueException("NO TASK FOUND WITH GIVEN ID: " + taskId);
+                throw new ResourceNotFoundException("NO TASK FOUND WITH GIVEN ID: " + taskId);
             } else {
                 // map task data to the response type DTO object and return
                 return CommonServletUtility.buildTaskResponseObject(existingTask);
             }
         } else {
             // throw corresponding exception
-            throw new InvalidRequestAttributeValueException("INVALID TASK ID: " + taskId);
+            throw new BadRequestException("INVALID TASK ID: " + taskId);
         }
     }
 
@@ -116,8 +118,10 @@ public class TaskService {
      * 
      * @param taskId - id of the existing task object to delete
      * @return deleted task object as an instance of TaskDataResponseDTO
-     * @throws InvalidRequestAttributeValueException - if the give id of the
-     *                                               existing task is invalid
+     * @throws BadRequestException       - if the give id of the
+     *                                   existing task is invalid
+     * @throws ResourceNotFoundException - if no task record exists with the given
+     *                                   task id
      */
     public TaskDataResponseDTO deleteTaskById(String taskId) {
         // check if the given task id is valid
@@ -128,7 +132,7 @@ public class TaskService {
             // check if a task object exists with the given id
             if (existingTaskObject == null) {
                 // throw corresponding exception
-                throw new InvalidRequestAttributeValueException("NO TASK FOUND WITH GIVEN ID: " + taskId);
+                throw new ResourceNotFoundException("NO TASK FOUND WITH GIVEN ID: " + taskId);
             }
 
             // delete existing task object
@@ -138,7 +142,7 @@ public class TaskService {
             return CommonServletUtility.buildTaskResponseObject(existingTaskObject);
         } else {
             // throw corresponding exception
-            throw new InvalidRequestAttributeValueException("INVALID TASK ID: " + taskId);
+            throw new BadRequestException("INVALID TASK ID: " + taskId);
         }
     }
 
@@ -148,17 +152,19 @@ public class TaskService {
      * @param taskId          - ID of the existing task record to be updated
      * @param updatedTaskData - updated task data to be stored in the database
      * @return updated task record as an instance of TaskDataResponseDTO
-     * @throws InvalidRequestAttributeValueException - if the given id of the
-     *                                               existing task record to update
-     *                                               is invalid or no task record
-     *                                               exists with the given id
+     * @throws BadRequestException       - if the given id of the
+     *                                   existing task record to update
+     *                                   is invalid or no PATCH request body has
+     *                                   been provided
+     * @throws ResourceNotFoundException - if no task record exists with the given
+     *                                   task id
      */
     public TaskDataResponseDTO updateTaskById(String taskId, TaskPatchRequestDTO updatedTaskData)
-            throws InvalidRequestAttributeValueException {
+            throws BadRequestException, ResourceNotFoundException {
         // check if the instance of the dto is null, i.e. no request body was provided
         if (updatedTaskData == null) {
             // throw appropriate exception
-            throw new InvalidRequestAttributeValueException("AN EMPTY REQUEST BODY IS NOT VALID");
+            throw new BadRequestException("AN EMPTY REQUEST BODY IS NOT VALID");
         }
 
         // check if the given task id is valid
@@ -169,7 +175,7 @@ public class TaskService {
             // check if a task object exists with the given id
             if (existingTaskObject == null) {
                 // throw corresponding exception
-                throw new InvalidRequestAttributeValueException("NO TASK FOUND WITH GIVEN ID: " + taskId);
+                throw new ResourceNotFoundException("NO TASK FOUND WITH GIVEN ID: " + taskId);
             }
 
             // check if an updated task title is provided
@@ -203,7 +209,7 @@ public class TaskService {
             return CommonServletUtility.buildTaskResponseObject(existingTaskObject);
         } else {
             // throw corresponding exception
-            throw new InvalidRequestAttributeValueException("INVALID TASK ID: " + taskId);
+            throw new BadRequestException("INVALID TASK ID: " + taskId);
         }
     }
 }

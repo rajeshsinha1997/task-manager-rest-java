@@ -9,6 +9,8 @@ import com.google.gson.JsonSyntaxException;
 import dtos.generic.GenericErrorResponseDTO;
 import dtos.generic.GenericResponseDTO;
 import dtos.response.TaskDataResponseDTO;
+import exceptions.BadRequestException;
+import exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import models.TaskModel;
@@ -107,7 +109,7 @@ public class CommonServletUtility {
 
         // check if the path information was not present or is an empty string or only
         // contains a single '/'
-        if (pathInformation == null || pathInformation.trim().isBlank() || pathInformation.trim().equals("/")) {
+        if (pathInformation == null || pathInformation.isBlank() || pathInformation.trim().equals("/")) {
             // return an empty string value
             return "";
         } else {
@@ -160,5 +162,30 @@ public class CommonServletUtility {
         return new TaskDataResponseDTO(taskData.getTaskId(), taskData.getTaskTitle(), taskData.getTaskDescription(),
                 taskData.isTaskCompleted(),
                 taskData.getTaskCreatedOn());
+    }
+
+    /**
+     * method to build error response on exception
+     * 
+     * @param e        - exception instance
+     * @param response - instance of HttpServletResponse
+     */
+    public static void buildApplicationExceptionResponse(Exception e, HttpServletResponse response) {
+        // check if the exception instance belongs to BadRequestException or
+        // JsonSyntaxException
+        if (e instanceof BadRequestException || e instanceof JsonSyntaxException) {
+            // build error response with response status code as 400 - BAD REQUEST
+            CommonServletUtility.buildErrorResponse(response, 400, e);
+        }
+        // else check if the exception instance belongs to BadRequestException
+        else if (e instanceof ResourceNotFoundException) {
+            // build error response with response status code as 404 - NOT FOUND
+            CommonServletUtility.buildErrorResponse(response, 404, e);
+        }
+        // else build error response with response status code as 500 - INTERNAL SERVER
+        // ERROR
+        else {
+            CommonServletUtility.buildErrorResponse(response, 500, e);
+        }
     }
 }

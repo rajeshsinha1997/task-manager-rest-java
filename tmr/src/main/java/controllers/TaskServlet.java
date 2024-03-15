@@ -7,8 +7,8 @@ import com.google.gson.JsonSyntaxException;
 import dtos.request.TaskPatchRequestDTO;
 import dtos.request.TaskPostRequestDTO;
 import dtos.response.TaskDataResponseDTO;
-import exceptions.InvalidRequestAttributeValueException;
-import exceptions.InvalidRequestUrlException;
+import exceptions.BadRequestException;
+import exceptions.ResourceNotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -25,6 +25,9 @@ import utilities.CommonServletUtility;
 public class TaskServlet extends HttpServlet {
     // create instance of TaskService
     private final transient TaskService taskService = new TaskService();
+
+    // constant string literals
+    private static final transient String RESOURCE_NOT_AVAILABLE_MESSAGE = "THE REQUESTED RESOURCE IS NOT AVAILABLE YET";
 
     @Override
     /**
@@ -48,7 +51,7 @@ public class TaskServlet extends HttpServlet {
                 // check if the path information data array contains more than one element
                 if (pathInformationDataArray.length > 1) {
                     // throw corresponding exception
-                    throw new InvalidRequestUrlException("THE REQUESTED RESOURCE IS NOT AVAILABLE YET");
+                    throw new ResourceNotFoundException(TaskServlet.RESOURCE_NOT_AVAILABLE_MESSAGE);
                 }
 
                 // find task object with given id and build success response with the existing
@@ -56,12 +59,9 @@ public class TaskServlet extends HttpServlet {
                 CommonServletUtility.buildSuccessResponse(resp, 200,
                         this.taskService.getTaskById(pathInformationDataArray[0]));
             }
-        } catch (InvalidRequestUrlException e) {
-            // build error response with status code as 404
-            CommonServletUtility.buildErrorResponse(resp, 404, e);
-        } catch (InvalidRequestAttributeValueException e) {
-            // build error response with status code as 400
-            CommonServletUtility.buildErrorResponse(resp, 400, e);
+        } catch (ResourceNotFoundException | BadRequestException e) {
+            // call exception handler method
+            CommonServletUtility.buildApplicationExceptionResponse(e, resp);
         }
     }
 
@@ -74,7 +74,7 @@ public class TaskServlet extends HttpServlet {
             // check if the request url contains any path information
             if (!CommonServletUtility.getRequestUrlPathInfo(req).isBlank()) {
                 // throw corresponding exception
-                throw new InvalidRequestUrlException("INVALID REQUEST URL");
+                throw new ResourceNotFoundException("INVALID REQUEST URL");
             }
 
             // get mapped request body
@@ -87,23 +87,9 @@ public class TaskServlet extends HttpServlet {
             // build success response
             CommonServletUtility.buildSuccessResponse(resp, 201, responseData);
         } catch (JsonSyntaxException | JsonIOException | IOException
-                | InvalidRequestAttributeValueException | InvalidRequestUrlException e) {
-            // check if the exception object is an instance of
-            // InvalidRequestAttributeValueException or JsonSyntaxException
-            if (e instanceof InvalidRequestAttributeValueException || e instanceof JsonSyntaxException) {
-                // build error response with status code as 400
-                CommonServletUtility.buildErrorResponse(resp, 400, e);
-            }
-            // else check if the exception object is an instance of
-            // InvalidRequestUrlException
-            else if (e instanceof InvalidRequestUrlException) {
-                // build error response with status code as 404
-                CommonServletUtility.buildErrorResponse(resp, 404, e);
-            }
-            // else build error response with status code as 500
-            else {
-                CommonServletUtility.buildErrorResponse(resp, 500, e);
-            }
+                | BadRequestException | ResourceNotFoundException e) {
+            // call exception handler method
+            CommonServletUtility.buildApplicationExceptionResponse(e, resp);
         }
     }
 
@@ -119,7 +105,7 @@ public class TaskServlet extends HttpServlet {
             // check if no path information is provided along with the request
             if (requestPathInformation.isBlank()) {
                 // throw corresponding exception
-                throw new InvalidRequestAttributeValueException("A VALID TASK ID WAS NOT PROVIDED");
+                throw new BadRequestException("A VALID TASK ID WAS NOT PROVIDED");
             }
 
             // get path information data array
@@ -129,19 +115,16 @@ public class TaskServlet extends HttpServlet {
             // check if the path information data array contains more than one element
             if (pathInformationDataArray.length > 1) {
                 // throw corresponding exception
-                throw new InvalidRequestUrlException("THE REQUESTED RESOURCE IS NOT AVAILABLE YET");
+                throw new ResourceNotFoundException(TaskServlet.RESOURCE_NOT_AVAILABLE_MESSAGE);
             }
 
             // call service method to delete existing task with the given id and build
             // success response with the deleted task object data
             CommonServletUtility.buildSuccessResponse(resp, 200,
                     this.taskService.deleteTaskById(pathInformationDataArray[0]));
-        } catch (InvalidRequestAttributeValueException e) {
-            // build error response with status code as 400
-            CommonServletUtility.buildErrorResponse(resp, 400, e);
-        } catch (InvalidRequestUrlException e) {
-            // build error response with status code as 404
-            CommonServletUtility.buildErrorResponse(resp, 404, e);
+        } catch (BadRequestException | ResourceNotFoundException e) {
+            // call exception handler method
+            CommonServletUtility.buildApplicationExceptionResponse(e, resp);
         }
     }
 
@@ -159,7 +142,7 @@ public class TaskServlet extends HttpServlet {
             // check if no path information is provided along with the request
             if (requestPathInformation.isBlank()) {
                 // throw corresponding exception
-                throw new InvalidRequestAttributeValueException("A VALID TASK ID WAS NOT PROVIDED");
+                throw new BadRequestException("A VALID TASK ID WAS NOT PROVIDED");
             }
 
             // get path information data array
@@ -169,7 +152,7 @@ public class TaskServlet extends HttpServlet {
             // check if the path information data array contains more than one element
             if (pathInformationDataArray.length > 1) {
                 // throw corresponding exception
-                throw new InvalidRequestUrlException("THE REQUESTED RESOURCE IS NOT AVAILABLE YET");
+                throw new ResourceNotFoundException(TaskServlet.RESOURCE_NOT_AVAILABLE_MESSAGE);
             }
 
             // get mapped request body
@@ -180,24 +163,10 @@ public class TaskServlet extends HttpServlet {
             // success response with the updated task object data
             CommonServletUtility.buildSuccessResponse(resp, 200,
                     this.taskService.updateTaskById(pathInformationDataArray[0], patchRequestDTO));
-        } catch (JsonSyntaxException | JsonIOException | IOException
-                | InvalidRequestAttributeValueException | InvalidRequestUrlException e) {
-            // check if the exception object is an instance of
-            // InvalidRequestAttributeValueException or JsonSyntaxException
-            if (e instanceof InvalidRequestAttributeValueException || e instanceof JsonSyntaxException) {
-                // build error response with status code as 400
-                CommonServletUtility.buildErrorResponse(resp, 400, e);
-            }
-            // else check if the exception object is an instance of
-            // InvalidRequestUrlException
-            else if (e instanceof InvalidRequestUrlException) {
-                // build error response with status code as 404
-                CommonServletUtility.buildErrorResponse(resp, 404, e);
-            }
-            // else build error response with status code as 500
-            else {
-                CommonServletUtility.buildErrorResponse(resp, 500, e);
-            }
+        } catch (BadRequestException | JsonSyntaxException | JsonIOException | IOException
+                | ResourceNotFoundException e) {
+            // call exception handler method
+            CommonServletUtility.buildApplicationExceptionResponse(e, resp);
         }
     }
 

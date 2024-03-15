@@ -1,7 +1,8 @@
 package utilities;
 
-import exceptions.InvalidRequestAttributeValueException;
 import org.junit.jupiter.api.Test;
+
+import exceptions.BadRequestException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,8 +14,7 @@ class DataValidationUtilityTest {
      */
     @Test
     void validateNullTitleNotAllowed() {
-        assertThrows(InvalidRequestAttributeValueException.class, () ->
-                DataValidationUtility.validateTaskTitle(null, false));
+        assertThrows(BadRequestException.class, () -> DataValidationUtility.validateTaskTitle(null, false));
     }
 
     /**
@@ -23,17 +23,18 @@ class DataValidationUtilityTest {
      */
     @Test
     void validateEmptyTitleNotAllowed() {
-        assertThrows(InvalidRequestAttributeValueException.class, () ->
-                DataValidationUtility.validateTaskTitle("", false));
+        assertThrows(BadRequestException.class,
+                () -> DataValidationUtility.validateTaskTitle("", false));
     }
 
     /**
-     * validates exception is thrown when task title is blank (whitespace) and not allowed
+     * validates exception is thrown when task title is blank (whitespace) and not
+     * allowed
      */
     @Test
     void validateBlankTitleNotAllowed() {
-        assertThrows(InvalidRequestAttributeValueException.class, () ->
-                DataValidationUtility.validateTaskTitle(" ", false));
+        assertThrows(BadRequestException.class,
+                () -> DataValidationUtility.validateTaskTitle(" ", false));
     }
 
     /**
@@ -53,7 +54,8 @@ class DataValidationUtilityTest {
     }
 
     /**
-     * validates that a task title containing only whitespace is permitted and returns null
+     * validates that a task title containing only whitespace is permitted and
+     * returns null
      */
     @Test
     void validateBlankTitleAllowed() {
@@ -77,8 +79,7 @@ class DataValidationUtilityTest {
     @Test
     void validateValidTitle() {
         String validTitle = "Valid Title";
-        String result = assertDoesNotThrow(() ->
-                DataValidationUtility.validateTaskTitle(validTitle, false));
+        String result = assertDoesNotThrow(() -> DataValidationUtility.validateTaskTitle(validTitle, false));
         assertEquals(validTitle, result);
     }
 
@@ -112,8 +113,7 @@ class DataValidationUtilityTest {
     @Test
     void validateValidDescription() {
         String validDescription = "Valid Description";
-        String result = assertDoesNotThrow(() ->
-                DataValidationUtility.validateTaskDescription(validDescription, true));
+        String result = assertDoesNotThrow(() -> DataValidationUtility.validateTaskDescription(validDescription, true));
         assertEquals(validDescription, result.trim());
     }
 
@@ -122,8 +122,8 @@ class DataValidationUtilityTest {
      */
     @Test
     void validateNullDescriptionNotAllowed() {
-        assertThrows(InvalidRequestAttributeValueException.class, () ->
-                DataValidationUtility.validateTaskDescription(null, false));
+        assertThrows(BadRequestException.class,
+                () -> DataValidationUtility.validateTaskDescription(null, false));
     }
 
     /**
