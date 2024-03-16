@@ -204,6 +204,12 @@ public class TaskService {
                 existingTaskObject.setTaskCompleted(updatedTaskData.getIsTaskCompleted());
             }
 
+            // check if the task completion status has been updated to 'true'
+            if (existingTaskObject.isTaskCompleted()) {
+                // update the task record as deleted
+                existingTaskObject.setTaskDeleted(true);
+            }
+
             // call repository method to update the existing task record in database
             this.taskRepository.updateTaskById(taskId, existingTaskObject);
 
