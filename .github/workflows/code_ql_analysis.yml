@@ -30,7 +30,7 @@ jobs:
           uses: actions/setup-java@v4.1.0
           with:
             distribution: 'oracle'
-            java-version: 17
+            java-version: 21
         
         - name: Build Java Project
           run: mvn clean install --file ${{github.workspace}}/tmr/pom.xml -DskipTests
