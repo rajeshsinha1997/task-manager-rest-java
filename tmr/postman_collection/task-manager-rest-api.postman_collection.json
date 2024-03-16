@@ -36,6 +36,118 @@
 			},
 			"response": [
 				{
+					"name": "201 - Task With Only Title",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"task-title\":\"Demo Task Title\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks",
+								""
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "222"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 16 Mar 2024 08:51:05 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"16-03-2024T14:21:05\",\n    \"response-data\": {\n        \"task-id\": \"5cba8705-3164-437b-b557-5e538e669444\",\n        \"task-title\": \"Demo Task Title\",\n        \"task-description\": \"\",\n        \"task-completed\": false,\n        \"task-created-on\": \"16-03-2024T14:21:05\"\n    }\n}"
+				},
+				{
+					"name": "201 - Task with Title and Description",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"task-title\":\"Demo Task Title\",\n    \"task-description\": \"Demo Task Description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks",
+								""
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "243"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 14 Mar 2024 19:25:20 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"15-03-2024T00:55:20\",\n    \"response-data\": {\n        \"task-id\": \"69d2bcad-10e3-498d-8b5b-0944555933b8\",\n        \"task-title\": \"Demo Task Title\",\n        \"task-description\": \"Demo Task Description\",\n        \"task-completed\": false,\n        \"task-created-on\": \"15-03-2024T00:55:20\"\n    }\n}"
+				},
+				{
 					"name": "400 - No Request Body",
 					"originalRequest": {
 						"method": "POST",
@@ -178,118 +290,6 @@
 					],
 					"cookie": [],
 					"body": "{\n    \"response-time\": \"07-03-2024T19:14:03\",\n    \"response-error-message\": \"TASK TITLE CAN'T BE NULL OR EMPTY\"\n}"
-				},
-				{
-					"name": "201 - Task with Title and Description",
-					"originalRequest": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"task-title\":\"Demo Task Title\",\n    \"task-description\": \"Demo Task Description\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/tmr/tasks/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"tmr",
-								"tasks",
-								""
-							]
-						}
-					},
-					"status": "Created",
-					"code": 201,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json;charset=UTF-8"
-						},
-						{
-							"key": "Content-Length",
-							"value": "243"
-						},
-						{
-							"key": "Date",
-							"value": "Thu, 14 Mar 2024 19:25:20 GMT"
-						},
-						{
-							"key": "Keep-Alive",
-							"value": "timeout=20"
-						},
-						{
-							"key": "Connection",
-							"value": "keep-alive"
-						}
-					],
-					"cookie": [],
-					"body": "{\n    \"response-time\": \"15-03-2024T00:55:20\",\n    \"response-data\": {\n        \"task-id\": \"69d2bcad-10e3-498d-8b5b-0944555933b8\",\n        \"task-title\": \"Demo Task Title\",\n        \"task-description\": \"Demo Task Description\",\n        \"task-completed\": false,\n        \"task-created-on\": \"15-03-2024T00:55:20\"\n    }\n}"
-				},
-				{
-					"name": "201 - Task with Title only",
-					"originalRequest": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"task-title\":\"Demo Task Title\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "http://localhost:8080/tmr/tasks/",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"tmr",
-								"tasks",
-								""
-							]
-						}
-					},
-					"status": "Created",
-					"code": 201,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json;charset=UTF-8"
-						},
-						{
-							"key": "Content-Length",
-							"value": "200"
-						},
-						{
-							"key": "Date",
-							"value": "Thu, 14 Mar 2024 19:26:21 GMT"
-						},
-						{
-							"key": "Keep-Alive",
-							"value": "timeout=20"
-						},
-						{
-							"key": "Connection",
-							"value": "keep-alive"
-						}
-					],
-					"cookie": [],
-					"body": "{\n    \"response-time\": \"15-03-2024T00:56:21\",\n    \"response-data\": {\n        \"task-id\": \"cd18aab4-02f7-4cd4-809f-b13c550d6f70\",\n        \"task-title\": \"Demo Task Title\",\n        \"task-completed\": false,\n        \"task-created-on\": \"15-03-2024T00:56:21\"\n    }\n}"
 				}
 			]
 		},
@@ -314,7 +314,7 @@
 			},
 			"response": [
 				{
-					"name": "200 - Get All Tasks",
+					"name": "200 - No Task Present",
 					"originalRequest": {
 						"method": "GET",
 						"header": [],
@@ -342,11 +342,11 @@
 						},
 						{
 							"key": "Content-Length",
-							"value": "390"
+							"value": "58"
 						},
 						{
 							"key": "Date",
-							"value": "Thu, 14 Mar 2024 19:27:04 GMT"
+							"value": "Sat, 16 Mar 2024 08:49:12 GMT"
 						},
 						{
 							"key": "Keep-Alive",
@@ -358,7 +358,54 @@
 						}
 					],
 					"cookie": [],
-					"body": "{\n    \"response-time\": \"15-03-2024T00:57:04\",\n    \"response-data\": [\n        {\n            \"task-id\": \"cd18aab4-02f7-4cd4-809f-b13c550d6f70\",\n            \"task-title\": \"Demo Task Title\",\n            \"task-completed\": false,\n            \"task-created-on\": \"15-03-2024T00:56:21\"\n        },\n        {\n            \"task-id\": \"69d2bcad-10e3-498d-8b5b-0944555933b8\",\n            \"task-title\": \"Demo Task Title\",\n            \"task-description\": \"Demo Task Description\",\n            \"task-completed\": false,\n            \"task-created-on\": \"15-03-2024T00:55:20\"\n        }\n    ]\n}"
+					"body": "{\n    \"response-time\": \"16-03-2024T14:19:12\",\n    \"response-data\": []\n}"
+				},
+				{
+					"name": "200 - Task Present",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks",
+								""
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "245"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 16 Mar 2024 08:49:39 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=20"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"16-03-2024T14:19:39\",\n    \"response-data\": [\n        {\n            \"task-id\": \"0142dab3-c914-4e1b-864f-e497d14f89eb\",\n            \"task-title\": \"Demo Task Title\",\n            \"task-description\": \"Demo Task Description\",\n            \"task-completed\": false,\n            \"task-created-on\": \"16-03-2024T14:19:35\"\n        }\n    ]\n}"
 				}
 			]
 		},
@@ -368,7 +415,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/tmr/tasks/cd18aab4-02f7-4cd4-809f-b13c550d6f70",
+					"raw": "http://localhost:8080/tmr/tasks/0142dab3-c914-4e1b-864f-e497d14f89eb",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -377,7 +424,7 @@
 					"path": [
 						"tmr",
 						"tasks",
-						"cd18aab4-02f7-4cd4-809f-b13c550d6f70"
+						"0142dab3-c914-4e1b-864f-e497d14f89eb"
 					]
 				}
 			},
@@ -523,7 +570,7 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8080/tmr/tasks/1034cd19-b69d-44ce-95ea-4a808db5d34d",
+					"raw": "http://localhost:8080/tmr/tasks/2bce570c-7727-4497-817a-adf3b56d99c1",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -532,7 +579,7 @@
 					"path": [
 						"tmr",
 						"tasks",
-						"1034cd19-b69d-44ce-95ea-4a808db5d34d"
+						"2bce570c-7727-4497-817a-adf3b56d99c1"
 					]
 				}
 			},
@@ -679,7 +726,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{}",
+					"raw": "{\n    \"task-title\": null,\n    \"task-description\": null,\n    \"task-completed\": null\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -687,7 +734,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/tmr/tasks/cd18aab4-02f7-4cd4-809f-b13c550d6f70",
+					"raw": "http://localhost:8080/tmr/tasks/86ee7b4a-8793-409a-92c7-442fcfb701f3",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -696,11 +743,54 @@
 					"path": [
 						"tmr",
 						"tasks",
-						"cd18aab4-02f7-4cd4-809f-b13c550d6f70"
+						"86ee7b4a-8793-409a-92c7-442fcfb701f3"
 					]
 				}
 			},
 			"response": [
+				{
+					"name": "400 - No PATCH Request Body",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/tmr/tasks/cd18aab4-02f7-4cd4-809f-b13c550d6f70",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tmr",
+								"tasks",
+								"cd18aab4-02f7-4cd4-809f-b13c550d6f70"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "101"
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 14 Mar 2024 19:37:28 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"response-time\": \"15-03-2024T01:07:28\",\n    \"response-error-message\": \"AN EMPTY REQUEST BODY IS NOT VALID\"\n}"
+				},
 				{
 					"name": "400 - No Task ID Provided",
 					"originalRequest": {
@@ -745,10 +835,26 @@
 					"body": "{\n    \"response-time\": \"15-03-2024T00:58:50\",\n    \"response-error-message\": \"A VALID TASK ID WAS NOT PROVIDED\"\n}"
 				},
 				{
-					"name": "400 - No Task Exists with Given Task ID",
+					"name": "404 - No Task Exists with Given Task ID",
 					"originalRequest": {
 						"method": "PATCH",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "http://localhost:8080/tmr/tasks/cd18aab4-02f7-4cd4-809f-b13c550d6f71",
 							"protocol": "http",
@@ -954,49 +1060,6 @@
 					],
 					"cookie": [],
 					"body": "{\n    \"response-time\": \"15-03-2024T01:03:39\",\n    \"response-data\": {\n        \"task-id\": \"cd18aab4-02f7-4cd4-809f-b13c550d6f70\",\n        \"task-title\": \"Demo Task Title 2\",\n        \"task-description\": \"Demo Task Description\",\n        \"task-completed\": true,\n        \"task-created-on\": \"15-03-2024T00:56:21\"\n    }\n}"
-				},
-				{
-					"name": "400 - No PATCH Request Body",
-					"originalRequest": {
-						"method": "PATCH",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/tmr/tasks/cd18aab4-02f7-4cd4-809f-b13c550d6f70",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"tmr",
-								"tasks",
-								"cd18aab4-02f7-4cd4-809f-b13c550d6f70"
-							]
-						}
-					},
-					"status": "Bad Request",
-					"code": 400,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json;charset=UTF-8"
-						},
-						{
-							"key": "Content-Length",
-							"value": "101"
-						},
-						{
-							"key": "Date",
-							"value": "Thu, 14 Mar 2024 19:37:28 GMT"
-						},
-						{
-							"key": "Connection",
-							"value": "close"
-						}
-					],
-					"cookie": [],
-					"body": "{\n    \"response-time\": \"15-03-2024T01:07:28\",\n    \"response-error-message\": \"AN EMPTY REQUEST BODY IS NOT VALID\"\n}"
 				}
 			]
 		}
