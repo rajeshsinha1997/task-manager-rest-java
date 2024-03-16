@@ -4,6 +4,7 @@ import java.io.IOException;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import constants.ErrorMessage;
 import dtos.request.TaskPatchRequestDTO;
 import dtos.request.TaskPostRequestDTO;
 import dtos.response.TaskDataResponseDTO;
@@ -26,38 +27,23 @@ public class TaskServlet extends HttpServlet {
     // create instance of TaskService
     private final transient TaskService taskService = new TaskService();
 
-    // constant string literals
-    private static final transient String RESOURCE_NOT_AVAILABLE_MESSAGE = "THE REQUESTED RESOURCE IS NOT AVAILABLE YET";
-
     @Override
     /**
      * method to process GET requests and build corresponding responses
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         try {
-            // get request path information
-            String requestPathInformation = CommonServletUtility.getRequestUrlPathInfo(req);
-
             // check if no path information is provided along with the request
-            if (requestPathInformation.isBlank()) {
+            if (CommonServletUtility.isRequestPathInformationBlank(req)) {
                 // build success response with the result from calling the service function to
                 // get list of all available tasks
                 CommonServletUtility.buildSuccessResponse(resp, 200, this.taskService.getAllTasks());
             } else {
-                // get path information data array
-                String[] pathInformationDataArray = CommonServletUtility
-                        .getRequestPathInformationDataAsArray(requestPathInformation);
-
-                // check if the path information data array contains more than one element
-                if (pathInformationDataArray.length > 1) {
-                    // throw corresponding exception
-                    throw new ResourceNotFoundException(TaskServlet.RESOURCE_NOT_AVAILABLE_MESSAGE);
-                }
-
                 // find task object with given id and build success response with the existing
                 // task data
                 CommonServletUtility.buildSuccessResponse(resp, 200,
-                        this.taskService.getTaskById(pathInformationDataArray[0]));
+                        this.taskService
+                                .getTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req)));
             }
         } catch (ResourceNotFoundException | BadRequestException e) {
             // call exception handler method
@@ -71,21 +57,21 @@ public class TaskServlet extends HttpServlet {
      */
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         try {
-            // check if the request url contains any path information
-            if (!CommonServletUtility.getRequestUrlPathInfo(req).isBlank()) {
+            // check if the request url does not contain any path information
+            if (CommonServletUtility.isRequestPathInformationBlank(req)) {
+                // get mapped request body
+                TaskPostRequestDTO postRequestDTO = CommonServletUtility.mapRequestBodyToObject(req,
+                        TaskPostRequestDTO.class);
+
+                // call service method to create a new task
+                TaskDataResponseDTO responseData = this.taskService.createNewTask(postRequestDTO);
+
+                // build success response
+                CommonServletUtility.buildSuccessResponse(resp, 201, responseData);
+            } else {
                 // throw corresponding exception
-                throw new ResourceNotFoundException("INVALID REQUEST URL");
+                throw new ResourceNotFoundException(ErrorMessage.INVALID_REQUEST_URL);
             }
-
-            // get mapped request body
-            TaskPostRequestDTO postRequestDTO = CommonServletUtility.mapRequestBodyToObject(req,
-                    TaskPostRequestDTO.class);
-
-            // call service method to create a new task
-            TaskDataResponseDTO responseData = this.taskService.createNewTask(postRequestDTO);
-
-            // build success response
-            CommonServletUtility.buildSuccessResponse(resp, 201, responseData);
         } catch (JsonSyntaxException | JsonIOException | IOException
                 | BadRequestException | ResourceNotFoundException e) {
             // call exception handler method
@@ -99,29 +85,16 @@ public class TaskServlet extends HttpServlet {
      */
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            // get request path information
-            String requestPathInformation = CommonServletUtility.getRequestUrlPathInfo(req);
-
             // check if no path information is provided along with the request
-            if (requestPathInformation.isBlank()) {
+            if (CommonServletUtility.isRequestPathInformationBlank(req)) {
                 // throw corresponding exception
-                throw new BadRequestException("A VALID TASK ID WAS NOT PROVIDED");
-            }
-
-            // get path information data array
-            String[] pathInformationDataArray = CommonServletUtility
-                    .getRequestPathInformationDataAsArray(requestPathInformation);
-
-            // check if the path information data array contains more than one element
-            if (pathInformationDataArray.length > 1) {
-                // throw corresponding exception
-                throw new ResourceNotFoundException(TaskServlet.RESOURCE_NOT_AVAILABLE_MESSAGE);
+                throw new BadRequestException(ErrorMessage.TASK_ID_NOT_PROVIDED);
             }
 
             // call service method to delete existing task with the given id and build
             // success response with the deleted task object data
             CommonServletUtility.buildSuccessResponse(resp, 200,
-                    this.taskService.deleteTaskById(pathInformationDataArray[0]));
+                    this.taskService.deleteTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req)));
         } catch (BadRequestException | ResourceNotFoundException e) {
             // call exception handler method
             CommonServletUtility.buildApplicationExceptionResponse(e, resp);
@@ -136,23 +109,10 @@ public class TaskServlet extends HttpServlet {
      */
     protected void doPatch(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            // get request path information
-            String requestPathInformation = CommonServletUtility.getRequestUrlPathInfo(req);
-
             // check if no path information is provided along with the request
-            if (requestPathInformation.isBlank()) {
+            if (CommonServletUtility.isRequestPathInformationBlank(req)) {
                 // throw corresponding exception
-                throw new BadRequestException("A VALID TASK ID WAS NOT PROVIDED");
-            }
-
-            // get path information data array
-            String[] pathInformationDataArray = CommonServletUtility
-                    .getRequestPathInformationDataAsArray(requestPathInformation);
-
-            // check if the path information data array contains more than one element
-            if (pathInformationDataArray.length > 1) {
-                // throw corresponding exception
-                throw new ResourceNotFoundException(TaskServlet.RESOURCE_NOT_AVAILABLE_MESSAGE);
+                throw new BadRequestException(ErrorMessage.TASK_ID_NOT_PROVIDED);
             }
 
             // get mapped request body
@@ -162,7 +122,8 @@ public class TaskServlet extends HttpServlet {
             // call service method to update the existing task with the given id and build
             // success response with the updated task object data
             CommonServletUtility.buildSuccessResponse(resp, 200,
-                    this.taskService.updateTaskById(pathInformationDataArray[0], patchRequestDTO));
+                    this.taskService.updateTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req),
+                            patchRequestDTO));
         } catch (BadRequestException | JsonSyntaxException | JsonIOException | IOException
                 | ResourceNotFoundException e) {
             // call exception handler method

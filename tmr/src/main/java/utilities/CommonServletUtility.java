@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import constants.ErrorMessage;
 import dtos.generic.GenericErrorResponseDTO;
 import dtos.generic.GenericResponseDTO;
 import dtos.response.TaskDataResponseDTO;
@@ -187,5 +188,38 @@ public class CommonServletUtility {
         else {
             CommonServletUtility.buildErrorResponse(response, 500, e);
         }
+    }
+
+    /**
+     * method to check if the path information received with the request is blank
+     * 
+     * @param request - instance of HttpServletRequest
+     * @return true if the path information with the request is blank, false
+     *         otherwise
+     */
+    public static boolean isRequestPathInformationBlank(HttpServletRequest request) {
+        return CommonServletUtility.getRequestUrlPathInfo(request).isBlank();
+    }
+
+    /**
+     * method to get id of a resource from the path information received with a
+     * request
+     * 
+     * @param request - instance of HttpServletRequest
+     * @return id of the resource received with the request
+     */
+    public static String getResourceIdFromRequestPathInformation(HttpServletRequest request) {
+        // get path information data array
+        String[] pathInformationDataArray = CommonServletUtility
+                .getRequestPathInformationDataAsArray(CommonServletUtility.getRequestUrlPathInfo(request));
+
+        // check if the path information data array contains more than one element
+        if (pathInformationDataArray.length > 1) {
+            // throw corresponding exception
+            throw new ResourceNotFoundException(ErrorMessage.RESOURCE_NOT_AVAILABLE);
+        }
+
+        // return the first entry of the path information data array
+        return pathInformationDataArray[0];
     }
 }
