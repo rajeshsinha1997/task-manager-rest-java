@@ -33,7 +33,7 @@ jobs:
             java-version: 17
         
         - name: Build Java Project
-          run: mvn clean install --file ${{github.workspace}}/tmr/pom.xml
+          run: mvn clean install --file ${{github.workspace}}/tmr/pom.xml -DskipTests
 
         - name: Perform CodeQL Analysis
           uses: github/codeql-action/analyze@v3
