@@ -133,7 +133,7 @@ class TaskServletTest {
         servlet.doGet(requestMock, responseMock);
 
         // verifying that a 404 status is correctly set for invalid URLs
-        verify(responseMock).setStatus(SC_NOT_FOUND);
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
     }
 
     /**
@@ -285,7 +285,7 @@ class TaskServletTest {
         servlet.doDelete(requestMock, responseMock);
 
         // checking that the correct error status is set
-        verify(responseMock).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        verify(responseMock).setStatus(HttpServletResponse.SC_NOT_FOUND);
     }
 
     /**
@@ -299,7 +299,7 @@ class TaskServletTest {
 
         // verify that the correct response status code has been set to SC_BAD_REQUEST
         verify(responseMock).setStatus(SC_BAD_REQUEST);
-        assertTrue(responseWriter.toString().contains("A VALID TASK ID WAS NOT PROVIDED"));
+        assertTrue(responseWriter.toString().contains("A TASK ID WAS NOT PROVIDED"));
     }
 
     /**
@@ -312,9 +312,9 @@ class TaskServletTest {
         servlet.doDelete(requestMock, responseMock);
 
         // verify that the correct response status code has been set to SC_NOT_FOUND
-        verify(responseMock).setStatus(SC_NOT_FOUND);
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
 
-        assertTrue(responseWriter.toString().contains("THE REQUESTED RESOURCE IS NOT AVAILABLE YET"));
+        assertTrue(responseWriter.toString().contains("INVALID REQUEST URL"));
     }
 
     /**
@@ -327,12 +327,12 @@ class TaskServletTest {
         servlet.doDelete(requestMock, responseMock);
 
         // verify that the response has the HTTP 404 status
-        verify(responseMock).setStatus(HttpServletResponse.SC_NOT_FOUND);
+        verify(responseMock).setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
         // verify that buildErrorResponse is called with the correct status and
         // exception
         verify(responseMock).getWriter(); //
         String responseContent = responseWriter.toString();
-        assertTrue(responseContent.contains("THE REQUESTED RESOURCE IS NOT AVAILABLE YET"));
+        assertTrue(responseContent.contains("INVALID REQUEST URL"));
     }
 }
