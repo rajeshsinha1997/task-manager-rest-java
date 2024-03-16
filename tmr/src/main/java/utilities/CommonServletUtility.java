@@ -216,7 +216,7 @@ public class CommonServletUtility {
         // check if the path information data array contains more than one element
         if (pathInformationDataArray.length > 1) {
             // throw corresponding exception
-            throw new ResourceNotFoundException(ErrorMessage.RESOURCE_NOT_AVAILABLE);
+            throw new BadRequestException(ErrorMessage.INVALID_REQUEST_URL);
         }
 
         // return the first entry of the path information data array

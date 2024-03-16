@@ -77,6 +77,12 @@ public class TaskService {
                 newTaskToBeCreated.getTaskDescription(), CommonUtility.getCurrentDateAndTimeStampString(),
                 CommonUtility.getCurrentDateAndTimeStampString(), false, false);
 
+        // check if the description of the new task record is null
+        if (newTaskRecord.getTaskDescription() == null) {
+            // update the description of the new task record to an empty string
+            newTaskRecord.setTaskDescription("");
+        }
+
         // add new task record to database
         this.taskRepository.addNewTask(newTaskRecord);
 
