@@ -174,33 +174,32 @@ class TaskServletTest {
         assertFalse(!responseWriter.toString().isEmpty());
     }
 
-    // /**
-    // * tests doPost method handling invalid request data and responding with error
-    // */
-    // @Test
-    // void doPostInvalidRequest() throws ServletException, IOException {
-    // String jsonData = "{\"task-title\":\"\", \"task-description\":\"This is a
-    // test task\"}";
-    // BufferedReader reader = new BufferedReader(new StringReader(jsonData));
-    // when(requestMock.getReader()).thenReturn(reader);
+    /**
+     * tests doPost method handling invalid request data and responding with error
+     */
+    @Test
+    void doPostInvalidRequest() throws ServletException, IOException {
+        String jsonData = "{\"task-title\":\"\", \"task-description\":\"This is a test task\"}";
+        BufferedReader reader = new BufferedReader(new StringReader(jsonData));
+        when(requestMock.getReader()).thenReturn(reader);
 
-    // // simulating an exception
-    // doThrow(new BadRequestException("Invalid task title")).when(taskServiceMock)
-    // .createNewTask(any());
+        // simulating an exception
+        doThrow(new BadRequestException("Invalid task title")).when(taskServiceMock)
+                .createNewTask(any());
 
-    // servlet.doPost(requestMock, responseMock);
+        servlet.doPost(requestMock, responseMock);
 
-    // verify(responseMock).setStatus(SC_BAD_REQUEST);
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
 
-    // PrintWriter writer = new PrintWriter(responseWriter);
-    // writer.flush();
-    // String responseContent = responseWriter.toString();
-    // assertTrue(responseContent.contains("Invalid task title"));
+        PrintWriter writer = new PrintWriter(responseWriter);
+        writer.flush();
+        String responseContent = responseWriter.toString();
+        assertTrue(responseContent.contains("Invalid task title"));
 
-    // GenericErrorResponseDTO errorResponse = new Gson().fromJson(responseContent,
-    // GenericErrorResponseDTO.class);
-    // assertEquals("Invalid task title", errorResponse.getErrorMessage());
-    // }
+        GenericErrorResponseDTO errorResponse = new Gson().fromJson(responseContent,
+                GenericErrorResponseDTO.class);
+        assertEquals("Invalid task title", errorResponse.getErrorMessage());
+    }
 
     /**
      * tests handling of malformed JSON in POST requests, expecting a 400 response
@@ -268,27 +267,26 @@ class TaskServletTest {
         verify(responseMock).setStatus(HttpServletResponse.SC_OK);
     }
 
-    // /**
-    // * tests handling DELETE request for a non-existing task ID, expecting an
-    // error
-    // * response
-    // */
-    // @Test
-    // void deleteNotFound() throws Exception {
-    // String nonExistingTaskId = "non-existing-id";
+    /**
+     * tests handling DELETE request for a non-existing task ID, expecting an
+     * error
+     * response
+     */
+    @Test
+    void deleteNotFound() throws Exception {
+        String nonExistingTaskId = "non-existing-id";
 
-    // // simulating an exception
-    // doThrow(new ResourceNotFoundException("No task found with given
-    // ID")).when(taskServiceMock)
-    // .deleteTaskById(nonExistingTaskId);
+        // simulating an exception
+        doThrow(new ResourceNotFoundException("No task found with given ID")).when(taskServiceMock)
+                .deleteTaskById(nonExistingTaskId);
 
-    // when(requestMock.getPathInfo()).thenReturn("/" + nonExistingTaskId);
+        when(requestMock.getPathInfo()).thenReturn("/" + nonExistingTaskId);
 
-    // servlet.doDelete(requestMock, responseMock);
+        servlet.doDelete(requestMock, responseMock);
 
-    // // checking that the correct error status is set
-    // verify(responseMock).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-    // }
+        // checking that the correct error status is set
+        verify(responseMock).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }
 
     /**
      * tests deletion without path info, expecting a BAD_REQUEST response
