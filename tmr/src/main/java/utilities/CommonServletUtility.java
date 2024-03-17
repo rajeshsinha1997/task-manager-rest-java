@@ -6,10 +6,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import constants.ErrorMessage;
 import dtos.generic.GenericErrorResponseDTO;
 import dtos.generic.GenericResponseDTO;
+import dtos.response.TaskDataResponseDTO;
+import exceptions.BadRequestException;
+import exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import models.TaskModel;
 
 public class CommonServletUtility {
 
@@ -105,7 +110,7 @@ public class CommonServletUtility {
 
         // check if the path information was not present or is an empty string or only
         // contains a single '/'
-        if (pathInformation == null || pathInformation.trim().isBlank() || pathInformation.trim().equals("/")) {
+        if (pathInformation == null || pathInformation.isBlank() || pathInformation.trim().equals("/")) {
             // return an empty string value
             return "";
         } else {
@@ -143,5 +148,78 @@ public class CommonServletUtility {
         // create and return the string array by splitting the request path information
         // data by '/'
         return requestPathInformationData.split("/");
+    }
+
+    /**
+     * method to create and return an instance of TaskDataResponseDTO from the task
+     * record as an instance of TaskModel
+     * 
+     * @param taskData - an instance of TaskModel
+     * @return an instance of TaskDataResponseDTO
+     */
+    public static TaskDataResponseDTO buildTaskResponseObject(TaskModel taskData) {
+        // create a new instance of TaskDataResponseDTO and return it after populating
+        // the required data
+        return new TaskDataResponseDTO(taskData.getTaskId(), taskData.getTaskTitle(), taskData.getTaskDescription(),
+                taskData.isTaskCompleted(),
+                taskData.getTaskCreatedOn());
+    }
+
+    /**
+     * method to build error response on exception
+     * 
+     * @param e        - exception instance
+     * @param response - instance of HttpServletResponse
+     */
+    public static void buildApplicationExceptionResponse(Exception e, HttpServletResponse response) {
+        // check if the exception instance belongs to BadRequestException or
+        // JsonSyntaxException
+        if (e instanceof BadRequestException || e instanceof JsonSyntaxException) {
+            // build error response with response status code as 400 - BAD REQUEST
+            CommonServletUtility.buildErrorResponse(response, 400, e);
+        }
+        // else check if the exception instance belongs to BadRequestException
+        else if (e instanceof ResourceNotFoundException) {
+            // build error response with response status code as 404 - NOT FOUND
+            CommonServletUtility.buildErrorResponse(response, 404, e);
+        }
+        // else build error response with response status code as 500 - INTERNAL SERVER
+        // ERROR
+        else {
+            CommonServletUtility.buildErrorResponse(response, 500, e);
+        }
+    }
+
+    /**
+     * method to check if the path information received with the request is blank
+     * 
+     * @param request - instance of HttpServletRequest
+     * @return true if the path information with the request is blank, false
+     *         otherwise
+     */
+    public static boolean isRequestPathInformationBlank(HttpServletRequest request) {
+        return CommonServletUtility.getRequestUrlPathInfo(request).isBlank();
+    }
+
+    /**
+     * method to get id of a resource from the path information received with a
+     * request
+     * 
+     * @param request - instance of HttpServletRequest
+     * @return id of the resource received with the request
+     */
+    public static String getResourceIdFromRequestPathInformation(HttpServletRequest request) {
+        // get path information data array
+        String[] pathInformationDataArray = CommonServletUtility
+                .getRequestPathInformationDataAsArray(CommonServletUtility.getRequestUrlPathInfo(request));
+
+        // check if the path information data array contains more than one element
+        if (pathInformationDataArray.length > 1) {
+            // throw corresponding exception
+            throw new BadRequestException(ErrorMessage.INVALID_REQUEST_URL);
+        }
+
+        // return the first entry of the path information data array
+        return pathInformationDataArray[0];
     }
 }

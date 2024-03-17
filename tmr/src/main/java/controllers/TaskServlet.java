@@ -4,10 +4,12 @@ import java.io.IOException;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
+import constants.ErrorMessage;
+import dtos.request.TaskPatchRequestDTO;
 import dtos.request.TaskPostRequestDTO;
 import dtos.response.TaskDataResponseDTO;
-import exceptions.InvalidRequestAttributeValueException;
-import exceptions.InvalidRequestUrlException;
+import exceptions.BadRequestException;
+import exceptions.ResourceNotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -31,36 +33,21 @@ public class TaskServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         try {
-            // get request path information
-            String requestPathInformation = CommonServletUtility.getRequestUrlPathInfo(req);
-
             // check if no path information is provided along with the request
-            if (requestPathInformation.isBlank()) {
+            if (CommonServletUtility.isRequestPathInformationBlank(req)) {
                 // build success response with the result from calling the service function to
                 // get list of all available tasks
                 CommonServletUtility.buildSuccessResponse(resp, 200, this.taskService.getAllTasks());
             } else {
-                // get path information data array
-                String[] pathInformationDataArray = CommonServletUtility
-                        .getRequestPathInformationDataAsArray(requestPathInformation);
-
-                // check if the path information data array contains more than one element
-                if (pathInformationDataArray.length > 1) {
-                    // throw corresponding exception
-                    throw new InvalidRequestUrlException("THE REQUESTED RESOURCE IS NOT AVAILABLE YET");
-                }
-
                 // find task object with given id and build success response with the existing
                 // task data
                 CommonServletUtility.buildSuccessResponse(resp, 200,
-                        this.taskService.getTaskById(pathInformationDataArray[0]));
+                        this.taskService
+                                .getTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req)));
             }
-        } catch (InvalidRequestUrlException e) {
-            // build error response with status code as 404
-            CommonServletUtility.buildErrorResponse(resp, 404, e);
-        } catch (InvalidRequestAttributeValueException e) {
-            // build error response with status code as 400
-            CommonServletUtility.buildErrorResponse(resp, 400, e);
+        } catch (ResourceNotFoundException | BadRequestException e) {
+            // call exception handler method
+            CommonServletUtility.buildApplicationExceptionResponse(e, resp);
         }
     }
 
@@ -70,39 +57,25 @@ public class TaskServlet extends HttpServlet {
      */
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
         try {
-            // check if the request url contains any path information
-            if (!CommonServletUtility.getRequestUrlPathInfo(req).isBlank()) {
+            // check if the request url does not contain any path information
+            if (CommonServletUtility.isRequestPathInformationBlank(req)) {
+                // get mapped request body
+                TaskPostRequestDTO postRequestDTO = CommonServletUtility.mapRequestBodyToObject(req,
+                        TaskPostRequestDTO.class);
+
+                // call service method to create a new task
+                TaskDataResponseDTO responseData = this.taskService.createNewTask(postRequestDTO);
+
+                // build success response
+                CommonServletUtility.buildSuccessResponse(resp, 201, responseData);
+            } else {
                 // throw corresponding exception
-                throw new InvalidRequestUrlException("INVALID REQUEST URL");
+                throw new ResourceNotFoundException(ErrorMessage.INVALID_REQUEST_URL);
             }
-
-            // get mapped request body
-            TaskPostRequestDTO postRequestDTO = CommonServletUtility.mapRequestBodyToObject(req,
-                    TaskPostRequestDTO.class);
-
-            // call service method to create a new task
-            TaskDataResponseDTO responseData = this.taskService.createNewTask(postRequestDTO);
-
-            // build success response
-            CommonServletUtility.buildSuccessResponse(resp, 201, responseData);
         } catch (JsonSyntaxException | JsonIOException | IOException
-                | InvalidRequestAttributeValueException | InvalidRequestUrlException e) {
-            // check if the exception object is an instance of
-            // InvalidRequestAttributeValueException or JsonSyntaxException
-            if (e instanceof InvalidRequestAttributeValueException || e instanceof JsonSyntaxException) {
-                // build error response with status code as 400
-                CommonServletUtility.buildErrorResponse(resp, 400, e);
-            }
-            // else check if the exception object is an instance of
-            // InvalidRequestUrlException
-            else if (e instanceof InvalidRequestUrlException) {
-                // build error response with status code as 404
-                CommonServletUtility.buildErrorResponse(resp, 404, e);
-            }
-            // else build error response with status code as 500
-            else {
-                CommonServletUtility.buildErrorResponse(resp, 500, e);
-            }
+                | BadRequestException | ResourceNotFoundException e) {
+            // call exception handler method
+            CommonServletUtility.buildApplicationExceptionResponse(e, resp);
         }
     }
 
@@ -112,35 +85,70 @@ public class TaskServlet extends HttpServlet {
      */
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
-            // get request path information
-            String requestPathInformation = CommonServletUtility.getRequestUrlPathInfo(req);
-
             // check if no path information is provided along with the request
-            if (requestPathInformation.isBlank()) {
+            if (CommonServletUtility.isRequestPathInformationBlank(req)) {
                 // throw corresponding exception
-                throw new InvalidRequestAttributeValueException("A VALID TASK ID WAS NOT PROVIDED");
-            }
-
-            // get path information data array
-            String[] pathInformationDataArray = CommonServletUtility
-                    .getRequestPathInformationDataAsArray(requestPathInformation);
-
-            // check if the path information data array contains more than one element
-            if (pathInformationDataArray.length > 1) {
-                // throw corresponding exception
-                throw new InvalidRequestUrlException("THE REQUESTED RESOURCE IS NOT AVAILABLE YET");
+                throw new BadRequestException(ErrorMessage.TASK_ID_NOT_PROVIDED);
             }
 
             // call service method to delete existing task with the given id and build
             // success response with the deleted task object data
             CommonServletUtility.buildSuccessResponse(resp, 200,
-                    this.taskService.deleteTaskById(pathInformationDataArray[0]));
-        } catch (InvalidRequestAttributeValueException e) {
-            // build error response with status code as 400
-            CommonServletUtility.buildErrorResponse(resp, 400, e);
-        } catch (InvalidRequestUrlException e) {
-            // build error response with status code as 404
-            CommonServletUtility.buildErrorResponse(resp, 404, e);
+                    this.taskService.deleteTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req)));
+        } catch (BadRequestException | ResourceNotFoundException e) {
+            // call exception handler method
+            CommonServletUtility.buildApplicationExceptionResponse(e, resp);
+        }
+    }
+
+    /**
+     * method to process PATCH requests and build corresponding response
+     * 
+     * @param req  - instance of HttpServletRequest class
+     * @param resp - instance of HttpServletResponse class
+     */
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            // check if no path information is provided along with the request
+            if (CommonServletUtility.isRequestPathInformationBlank(req)) {
+                // throw corresponding exception
+                throw new BadRequestException(ErrorMessage.TASK_ID_NOT_PROVIDED);
+            }
+
+            // get mapped request body
+            TaskPatchRequestDTO patchRequestDTO = CommonServletUtility.mapRequestBodyToObject(req,
+                    TaskPatchRequestDTO.class);
+
+            // call service method to update the existing task with the given id and build
+            // success response with the updated task object data
+            CommonServletUtility.buildSuccessResponse(resp, 200,
+                    this.taskService.updateTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req),
+                            patchRequestDTO));
+        } catch (BadRequestException | JsonSyntaxException | JsonIOException | IOException
+                | ResourceNotFoundException e) {
+            // call exception handler method
+            CommonServletUtility.buildApplicationExceptionResponse(e, resp);
+        }
+    }
+
+    @Override
+    /**
+     * override the service method of HttpServlet class so that we can forward any
+     * PATCH request to our own custom implementation of the PATCH endpoint. For
+     * rest of the request methods we will call the super method of HttpServlet
+     * class, which will handle the processing afterwards.
+     */
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // get request method name
+        String requestMethod = req.getMethod();
+
+        // check if the request method name is PATCH
+        if (requestMethod.equals("PATCH")) {
+            // make call to the custom implemented PATCH method
+            this.doPatch(req, resp);
+        } else {
+            // make call to the service method of HttpServlet class
+            super.service(req, resp);
         }
     }
 

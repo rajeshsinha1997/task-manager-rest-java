@@ -1,5 +1,5 @@
 # Task Manager REST API
-This is a basic Java based REST Application using which an user can ___Create a New Task___, ___View List of All Active Tasks___, ___Find a Particular Task Using It's Corresponding ID___, ___Delete a Task Using It's Corresponding ID___.
+This is a basic Java based REST Application using which an user can ___Create a New Task___, ___View List of All Active Tasks___, ___Find a Particular Task Using It's Corresponding ID___,___Update a Particular Task Using It's Corresponding ID___, and ___Delete a Task Using It's Corresponding ID___.
 
 ## Repository Status
 [![Build And Publish Docker Image](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/build_and_publish_docker_image.yml/badge.svg?branch=main)](https://github.com/rajeshsinha1997/task-manager-rest-java/actions/workflows/build_and_publish_docker_image.yml)\
@@ -12,7 +12,7 @@ This is a basic Java based REST Application using which an user can ___Create a 
 - Web-Framework Used:&emsp;&nbsp;&nbsp;Servlet
 - Database Used:&emsp;&emsp;&emsp;&emsp;&emsp;Local In-Memory
 - Published:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;[Docker Image](https://hub.docker.com/r/rajeshsinha1997/task-manager-rest-api)
-- Contributors:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;[ALEXEY SHARY](https://github.com/AlexeyShary)
+- Contributors:&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;[ALEXEY SHARY](https://github.com/AlexeyShary), [Alberto Lago](https://github.com/albertoLago)
 - Postman Collection:&emsp;&emsp;&emsp;[Click Here](https://github.com/rajeshsinha1997/task-manager-rest-java/blob/main/tmr/postman_collection/task-manager-rest-api.postman_collection.json)
 
 ## Steps to Setup Project In Local System Without Docker
@@ -41,10 +41,11 @@ docker run -it --rm -d -p <PORT_NUMBER>:8080 rajeshsinha1997/task-manager-rest-a
 
 ## Endpoints
 Below are the endpoints which are available to use,
-1. POST /tasks&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;- create a new task
-2. GET /tasks&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;- get a list of all active tasks
-3. GET /tasks/{task_id}&emsp;&emsp;&nbsp;&nbsp;- find a particular task by it's corresponding id
-4. DELETE /tasks/{task_id}&nbsp;&nbsp;&nbsp;- delete a particular task by it's corresponding id
+1. POST /tasks&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;&nbsp;- create a new task
+2. GET /tasks&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&nbsp;- get a list of all active tasks
+3. GET /tasks/{task_id}&emsp;&emsp;&nbsp;&nbsp;&nbsp;- find a particular task by it's corresponding id
+4. PATCH /tasks/{task_id}&emsp;&nbsp;&nbsp;- update a particular task by it's corresponding id
+5. DELETE /tasks/{task_id}&nbsp;&nbsp;&nbsp;&nbsp;- delete a particular task by it's corresponding id
 
 The [Postman Collection](https://github.com/rajeshsinha1997/task-manager-rest-java/blob/main/tmr/postman_collection/task-manager-rest-api.postman_collection.json) present in the repository contains more detailed information about these endpoints.
 

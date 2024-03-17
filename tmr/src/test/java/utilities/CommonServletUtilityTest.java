@@ -65,8 +65,8 @@ class CommonServletUtilityTest {
             when(mockRequest.getReader()).thenReturn(reader);
 
             // asserts that an exception is thrown for malformed JSON
-            assertThrows(JsonSyntaxException.class, () ->
-                            CommonServletUtility.mapRequestBodyToObject(mockRequest, TaskPostRequestDTO.class),
+            assertThrows(JsonSyntaxException.class,
+                    () -> CommonServletUtility.mapRequestBodyToObject(mockRequest, TaskPostRequestDTO.class),
                     "Should throw an exception for malformed JSON");
         } catch (IOException e) {
             fail("Should not throw IOException in this test.", e);
@@ -90,10 +90,11 @@ class CommonServletUtilityTest {
     @Test
     void buildSuccessResponse() {
         // DTO to send in the response
-        TaskDataResponseDTO dto = new TaskDataResponseDTO(null, null, null, null);
+        TaskDataResponseDTO dto = new TaskDataResponseDTO(null, null, null, null, null);
         dto.setTaskId("2");
         dto.setTaskTitle("New Task");
         dto.setTaskDescription("Description of the new task");
+        dto.setTaskCompleted(false);
         dto.setTaskCreatedOn("01-01-2023");
 
         // building the success response
@@ -142,7 +143,8 @@ class CommonServletUtilityTest {
 
         // test with leading and trailing slash
         when(mockRequest.getPathInfo()).thenReturn("/test/");
-        assertEquals("test", CommonServletUtility.getRequestUrlPathInfo(mockRequest), "Should trim leading and trailing slash");
+        assertEquals("test", CommonServletUtility.getRequestUrlPathInfo(mockRequest),
+                "Should trim leading and trailing slash");
     }
 
     /**
@@ -180,15 +182,18 @@ class CommonServletUtilityTest {
     @Test
     void getRequestUrlPathInfoMultipleSections() {
         when(mockRequest.getPathInfo()).thenReturn("/section1/section2/section3");
-        assertEquals("section1/section2/section3", CommonServletUtility.getRequestUrlPathInfo(mockRequest), "Should return correct path info with multiple sections");
+        assertEquals("section1/section2/section3", CommonServletUtility.getRequestUrlPathInfo(mockRequest),
+                "Should return correct path info with multiple sections");
     }
 
     /**
-     * verifies that getRequestUrlPathInfo does not alter a path info that is already correct
+     * verifies that getRequestUrlPathInfo does not alter a path info that is
+     * already correct
      */
     @Test
     void getRequestUrlPathInfoCorrectPath() {
         when(mockRequest.getPathInfo()).thenReturn("test/path");
-        assertEquals("test/path", CommonServletUtility.getRequestUrlPathInfo(mockRequest), "Should not alter correct path info");
+        assertEquals("test/path", CommonServletUtility.getRequestUrlPathInfo(mockRequest),
+                "Should not alter correct path info");
     }
 }

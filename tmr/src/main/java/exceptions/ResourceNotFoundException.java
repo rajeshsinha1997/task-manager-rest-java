@@ -1,16 +1,15 @@
 package exceptions;
 
 /**
- * exception to be thrown if an invalid value is given via request
+ * exception to be thrown if a requested resource is not available or not found
  */
-public class InvalidRequestAttributeValueException extends RuntimeException {
-
+public class ResourceNotFoundException extends RuntimeException {
     /**
      * constructor
      * 
      * @param errorMessage - error message to be displayed
      */
-    public InvalidRequestAttributeValueException(String errorMessage) {
+    public ResourceNotFoundException(String errorMessage) {
         // call super by passing the error message
         super(errorMessage);
     }

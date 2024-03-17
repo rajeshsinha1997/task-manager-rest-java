@@ -1,16 +1,21 @@
 package services;
 
+import dtos.request.TaskPatchRequestDTO;
 import dtos.request.TaskPostRequestDTO;
 import dtos.response.TaskDataResponseDTO;
-import exceptions.InvalidRequestAttributeValueException;
+import exceptions.BadRequestException;
+import exceptions.ResourceNotFoundException;
 import models.TaskModel;
 import repositories.ITaskRepository;
 import repositories.TaskRepositoryLocalMemory;
+import utilities.CommonServletUtility;
 import utilities.CommonUtility;
 import utilities.DataValidationUtility;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import constants.ErrorMessage;
 
 public class TaskService {
     // create instance of ITaskRepository
@@ -27,11 +32,7 @@ public class TaskService {
         // call repository method to get list of all available tasks and return after
         // mapping the list items to the required result DTO type
         return this.taskRepository.findAllTasks().stream()
-                .map(taskModel -> new TaskDataResponseDTO(
-                        taskModel.getTaskId(),
-                        taskModel.getTaskTitle(),
-                        taskModel.getTaskDescription(),
-                        taskModel.getTaskCreatedOn()))
+                .map(CommonServletUtility::buildTaskResponseObject)
                 .collect(Collectors.toList());
     }
 
@@ -40,12 +41,13 @@ public class TaskService {
      * 
      * @param newTaskToBeCreated - dto instance containing data of the new task to
      *                           be created
+     * @throws BadRequestException - if no POST request body has been provided
      */
     public TaskDataResponseDTO createNewTask(TaskPostRequestDTO newTaskToBeCreated) {
         // check if the instance of the dto is null, i.e. no request body was provided
         if (newTaskToBeCreated == null) {
             // throw appropriate exception
-            throw new InvalidRequestAttributeValueException("AN EMPTY REQUEST BODY IS NOT VALID");
+            throw new BadRequestException(ErrorMessage.EMPTY_REQUEST_BODY_NOT_VALID);
         }
 
         // validate new task data
@@ -75,12 +77,17 @@ public class TaskService {
                 newTaskToBeCreated.getTaskDescription(), CommonUtility.getCurrentDateAndTimeStampString(),
                 CommonUtility.getCurrentDateAndTimeStampString(), false, false);
 
+        // check if the description of the new task record is null
+        if (newTaskRecord.getTaskDescription() == null) {
+            // update the description of the new task record to an empty string
+            newTaskRecord.setTaskDescription("");
+        }
+
         // add new task record to database
         this.taskRepository.addNewTask(newTaskRecord);
 
         // create and return response dto object
-        return new TaskDataResponseDTO(newTaskRecord.getTaskId(), newTaskRecord.getTaskTitle(),
-                newTaskRecord.getTaskDescription(), newTaskRecord.getTaskCreatedOn());
+        return CommonServletUtility.buildTaskResponseObject(newTaskRecord);
     }
 
     /**
@@ -89,10 +96,10 @@ public class TaskService {
      * @param taskId - id value to use to find the expected task object
      * @return an instance of TaskDataResponseDTO if a task object found with the
      *         given id
-     * @throws InvalidRequestAttributeValueException - if no task object found with
-     *                                               the given task id
-     * @throws InvalidRequestAttributeValueException - if the given task id is
-     *                                               invalid
+     * @throws ResourceNotFoundException - if no task object found with
+     *                                   the given task id
+     * @throws BadRequestException       - if the given task id is
+     *                                   invalid
      */
     public TaskDataResponseDTO getTaskById(String taskId) {
         // check if the given task id is valid
@@ -103,15 +110,14 @@ public class TaskService {
             // check if the existing task object is null
             if (existingTask == null) {
                 // throw corresponding exception
-                throw new InvalidRequestAttributeValueException("NO TASK FOUND WITH GIVEN ID: " + taskId);
+                throw new ResourceNotFoundException(ErrorMessage.NO_TASK_FOUND_WITH_ID + taskId);
             } else {
                 // map task data to the response type DTO object and return
-                return new TaskDataResponseDTO(existingTask.getTaskId(), existingTask.getTaskTitle(),
-                        existingTask.getTaskDescription(), existingTask.getTaskCreatedOn());
+                return CommonServletUtility.buildTaskResponseObject(existingTask);
             }
         } else {
             // throw corresponding exception
-            throw new InvalidRequestAttributeValueException("INVALID TASK ID: " + taskId);
+            throw new BadRequestException(ErrorMessage.INVALID_TASK_ID + taskId);
         }
     }
 
@@ -120,8 +126,10 @@ public class TaskService {
      * 
      * @param taskId - id of the existing task object to delete
      * @return deleted task object as an instance of TaskDataResponseDTO
-     * @throws InvalidRequestAttributeValueException - if the give id of the
-     *                                               existing task is invalid
+     * @throws BadRequestException       - if the give id of the
+     *                                   existing task is invalid
+     * @throws ResourceNotFoundException - if no task record exists with the given
+     *                                   task id
      */
     public TaskDataResponseDTO deleteTaskById(String taskId) {
         // check if the given task id is valid
@@ -132,18 +140,90 @@ public class TaskService {
             // check if a task object exists with the given id
             if (existingTaskObject == null) {
                 // throw corresponding exception
-                throw new InvalidRequestAttributeValueException("NO TASK FOUND WITH GIVEN ID: " + taskId);
+                throw new ResourceNotFoundException(ErrorMessage.NO_TASK_FOUND_WITH_ID + taskId);
             }
 
             // delete existing task object
             this.taskRepository.deleteTaskById(taskId);
 
             // return the deleted task object mapped as an instance of TaskDataResponseDTO
-            return new TaskDataResponseDTO(existingTaskObject.getTaskId(), existingTaskObject.getTaskTitle(),
-                    existingTaskObject.getTaskDescription(), existingTaskObject.getTaskCreatedOn());
+            return CommonServletUtility.buildTaskResponseObject(existingTaskObject);
         } else {
             // throw corresponding exception
-            throw new InvalidRequestAttributeValueException("INVALID TASK ID: " + taskId);
+            throw new BadRequestException(ErrorMessage.INVALID_TASK_ID + taskId);
+        }
+    }
+
+    /**
+     * method to update an existing task object by it's corresponding id
+     * 
+     * @param taskId          - ID of the existing task record to be updated
+     * @param updatedTaskData - updated task data to be stored in the database
+     * @return updated task record as an instance of TaskDataResponseDTO
+     * @throws BadRequestException       - if the given id of the
+     *                                   existing task record to update
+     *                                   is invalid or no PATCH request body has
+     *                                   been provided
+     * @throws ResourceNotFoundException - if no task record exists with the given
+     *                                   task id
+     */
+    public TaskDataResponseDTO updateTaskById(String taskId, TaskPatchRequestDTO updatedTaskData)
+            throws BadRequestException, ResourceNotFoundException {
+        // check if the instance of the dto is null, i.e. no request body was provided
+        if (updatedTaskData == null) {
+            // throw appropriate exception
+            throw new BadRequestException(ErrorMessage.EMPTY_REQUEST_BODY_NOT_VALID);
+        }
+
+        // check if the given task id is valid
+        if (DataValidationUtility.isValidTaskId(taskId)) {
+            // fetch the existing task object with the given id
+            TaskModel existingTaskObject = this.taskRepository.findTaskById(taskId);
+
+            // check if a task object exists with the given id
+            if (existingTaskObject == null) {
+                // throw corresponding exception
+                throw new ResourceNotFoundException(ErrorMessage.NO_TASK_FOUND_WITH_ID + taskId);
+            }
+
+            // check if an updated task title is provided
+            if (updatedTaskData.getTaskTitle() != null) {
+                // validate the updated task-title
+                DataValidationUtility.validateTaskTitle(updatedTaskData.getTaskTitle(), false);
+
+                // update task title in existing task record
+                existingTaskObject.setTaskTitle(updatedTaskData.getTaskTitle());
+            }
+
+            // check if an updated task description is provided
+            if (updatedTaskData.getTaskDescription() != null) {
+                // validate the updated task-description
+                DataValidationUtility.validateTaskDescription(updatedTaskData.getTaskDescription(), true);
+
+                // update task description in existing task record
+                existingTaskObject.setTaskDescription(updatedTaskData.getTaskDescription());
+            }
+
+            // check if an update task completion flag value is provided
+            if (updatedTaskData.getIsTaskCompleted() != null) {
+                // update task completion flag in existing task record
+                existingTaskObject.setTaskCompleted(updatedTaskData.getIsTaskCompleted());
+            }
+
+            // check if the task completion status has been updated to 'true'
+            if (existingTaskObject.isTaskCompleted()) {
+                // update the task record as deleted
+                existingTaskObject.setTaskDeleted(true);
+            }
+
+            // call repository method to update the existing task record in database
+            this.taskRepository.updateTaskById(taskId, existingTaskObject);
+
+            // create and return task response object
+            return CommonServletUtility.buildTaskResponseObject(existingTaskObject);
+        } else {
+            // throw corresponding exception
+            throw new BadRequestException(ErrorMessage.INVALID_TASK_ID + taskId);
         }
     }
 }
