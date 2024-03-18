@@ -14,7 +14,7 @@ class TaskRepositoryLocalMemoryTest {
 
     @BeforeEach
     void setUp() {
-        repository = new TaskRepositoryLocalMemory();
+        repository = new TaskRepositoryLocalMemoryImpl();
     }
 
     /**

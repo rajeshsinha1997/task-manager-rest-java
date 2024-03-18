@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import services.ServiceFactory;
 import services.TaskService;
 import utilities.CommonServletUtility;
 
@@ -24,25 +25,26 @@ import utilities.CommonServletUtility;
  * objects
  */
 public class TaskServlet extends HttpServlet {
-    // create instance of TaskService
-    private final transient TaskService taskService = new TaskService();
 
     @Override
     /**
      * method to process GET requests and build corresponding responses
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+        // get service instance
+        TaskService taskService = ServiceFactory.getTaskServiceInstance();
+
         try {
             // check if no path information is provided along with the request
             if (CommonServletUtility.isRequestPathInformationBlank(req)) {
                 // build success response with the result from calling the service function to
                 // get list of all available tasks
-                CommonServletUtility.buildSuccessResponse(resp, 200, this.taskService.getAllTasks());
+                CommonServletUtility.buildSuccessResponse(resp, 200, taskService.getAllTasks());
             } else {
                 // find task object with given id and build success response with the existing
                 // task data
                 CommonServletUtility.buildSuccessResponse(resp, 200,
-                        this.taskService
+                        taskService
                                 .getTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req)));
             }
         } catch (ResourceNotFoundException | BadRequestException e) {
@@ -63,8 +65,9 @@ public class TaskServlet extends HttpServlet {
                 TaskPostRequestDTO postRequestDTO = CommonServletUtility.mapRequestBodyToObject(req,
                         TaskPostRequestDTO.class);
 
-                // call service method to create a new task
-                TaskDataResponseDTO responseData = this.taskService.createNewTask(postRequestDTO);
+                // get service instance and call service method to create a new task
+                TaskDataResponseDTO responseData = ServiceFactory.getTaskServiceInstance()
+                        .createNewTask(postRequestDTO);
 
                 // build success response
                 CommonServletUtility.buildSuccessResponse(resp, 201, responseData);
@@ -91,10 +94,11 @@ public class TaskServlet extends HttpServlet {
                 throw new BadRequestException(ErrorMessage.TASK_ID_NOT_PROVIDED);
             }
 
-            // call service method to delete existing task with the given id and build
-            // success response with the deleted task object data
+            // get service instance and call service method to delete existing task with the
+            // given id and build success response with the deleted task object data
             CommonServletUtility.buildSuccessResponse(resp, 200,
-                    this.taskService.deleteTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req)));
+                    ServiceFactory.getTaskServiceInstance()
+                            .deleteTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req)));
         } catch (BadRequestException | ResourceNotFoundException e) {
             // call exception handler method
             CommonServletUtility.buildApplicationExceptionResponse(e, resp);
@@ -119,10 +123,11 @@ public class TaskServlet extends HttpServlet {
             TaskPatchRequestDTO patchRequestDTO = CommonServletUtility.mapRequestBodyToObject(req,
                     TaskPatchRequestDTO.class);
 
-            // call service method to update the existing task with the given id and build
-            // success response with the updated task object data
+            // get service instance and call service method to update the existing task with
+            // the given id and build success response with the updated task object data
             CommonServletUtility.buildSuccessResponse(resp, 200,
-                    this.taskService.updateTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req),
+                    ServiceFactory.getTaskServiceInstance().updateTaskById(
+                            CommonServletUtility.getResourceIdFromRequestPathInformation(req),
                             patchRequestDTO));
         } catch (BadRequestException | JsonSyntaxException | JsonIOException | IOException
                 | ResourceNotFoundException e) {

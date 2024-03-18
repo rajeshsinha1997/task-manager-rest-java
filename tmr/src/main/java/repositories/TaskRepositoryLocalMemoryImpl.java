@@ -10,9 +10,14 @@ import java.util.Map;
  * implementation class of the ITaskRepository interface with database as a
  * local in-memory HashMap
  */
-public class TaskRepositoryLocalMemory implements ITaskRepository {
+public class TaskRepositoryLocalMemoryImpl implements ITaskRepository {
     // create local in-memory HashMap to store task data
     Map<String, TaskModel> tasks = new HashMap<>();
+
+    // create default constructor to limit instantiation capabilities to the current
+    // package only
+    TaskRepositoryLocalMemoryImpl() {
+    }
 
     @Override
     public List<TaskModel> findAllTasks() {
