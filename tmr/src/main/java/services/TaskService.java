@@ -7,7 +7,7 @@ import exceptions.BadRequestException;
 import exceptions.ResourceNotFoundException;
 import models.TaskModel;
 import repositories.ITaskRepository;
-import repositories.TaskRepositoryLocalMemory;
+import repositories.RepositoryFactory;
 import utilities.CommonServletUtility;
 import utilities.CommonUtility;
 import utilities.DataValidationUtility;
@@ -18,8 +18,10 @@ import java.util.stream.Collectors;
 import constants.ErrorMessage;
 
 public class TaskService {
-    // create instance of ITaskRepository
-    private ITaskRepository taskRepository = new TaskRepositoryLocalMemory();
+    // create default constructor to limit instantiation capabilities into current
+    // package only
+    TaskService() {
+    }
 
     /**
      * retrieves all tasks from the database and maps them into a list of
@@ -31,7 +33,7 @@ public class TaskService {
     public List<TaskDataResponseDTO> getAllTasks() {
         // call repository method to get list of all available tasks and return after
         // mapping the list items to the required result DTO type
-        return this.taskRepository.findAllTasks().stream()
+        return RepositoryFactory.getTaskRepositoryInstance().findAllTasks().stream()
                 .map(CommonServletUtility::buildTaskResponseObject)
                 .collect(Collectors.toList());
     }
@@ -57,8 +59,11 @@ public class TaskService {
         // generate id of the new task
         String taskId = CommonUtility.generateUUIDv4();
 
+        // get repository instance from factory
+        ITaskRepository taskRepository = RepositoryFactory.getTaskRepositoryInstance();
+
         // find an already existing task record having the generated task id
-        TaskModel existingTaskRecord = this.taskRepository.findTaskById(taskId);
+        TaskModel existingTaskRecord = taskRepository.findTaskById(taskId);
 
         // check if a task record exists having the generated task id
         if (existingTaskRecord != null) {
@@ -68,7 +73,7 @@ public class TaskService {
                 taskId = CommonUtility.generateUUIDv4();
 
                 // find an already existing task record having the generated task id
-                existingTaskRecord = this.taskRepository.findTaskById(taskId);
+                existingTaskRecord = taskRepository.findTaskById(taskId);
             }
         }
 
@@ -84,7 +89,7 @@ public class TaskService {
         }
 
         // add new task record to database
-        this.taskRepository.addNewTask(newTaskRecord);
+        taskRepository.addNewTask(newTaskRecord);
 
         // create and return response dto object
         return CommonServletUtility.buildTaskResponseObject(newTaskRecord);
@@ -105,7 +110,7 @@ public class TaskService {
         // check if the given task id is valid
         if (DataValidationUtility.isValidTaskId(taskId)) {
             // find task with the given id from the database
-            TaskModel existingTask = this.taskRepository.findTaskById(taskId);
+            TaskModel existingTask = RepositoryFactory.getTaskRepositoryInstance().findTaskById(taskId);
 
             // check if the existing task object is null
             if (existingTask == null) {
@@ -134,8 +139,11 @@ public class TaskService {
     public TaskDataResponseDTO deleteTaskById(String taskId) {
         // check if the given task id is valid
         if (DataValidationUtility.isValidTaskId(taskId)) {
+            // get repository instance from factory
+            ITaskRepository taskRepository = RepositoryFactory.getTaskRepositoryInstance();
+
             // fetch the existing task object with the given id
-            TaskModel existingTaskObject = this.taskRepository.findTaskById(taskId);
+            TaskModel existingTaskObject = taskRepository.findTaskById(taskId);
 
             // check if a task object exists with the given id
             if (existingTaskObject == null) {
@@ -144,7 +152,7 @@ public class TaskService {
             }
 
             // delete existing task object
-            this.taskRepository.deleteTaskById(taskId);
+            taskRepository.deleteTaskById(taskId);
 
             // return the deleted task object mapped as an instance of TaskDataResponseDTO
             return CommonServletUtility.buildTaskResponseObject(existingTaskObject);
@@ -177,8 +185,11 @@ public class TaskService {
 
         // check if the given task id is valid
         if (DataValidationUtility.isValidTaskId(taskId)) {
+            // get repository instance from factory
+            ITaskRepository taskRepository = RepositoryFactory.getTaskRepositoryInstance();
+
             // fetch the existing task object with the given id
-            TaskModel existingTaskObject = this.taskRepository.findTaskById(taskId);
+            TaskModel existingTaskObject = taskRepository.findTaskById(taskId);
 
             // check if a task object exists with the given id
             if (existingTaskObject == null) {
@@ -217,7 +228,7 @@ public class TaskService {
             }
 
             // call repository method to update the existing task record in database
-            this.taskRepository.updateTaskById(taskId, existingTaskObject);
+            taskRepository.updateTaskById(taskId, existingTaskObject);
 
             // create and return task response object
             return CommonServletUtility.buildTaskResponseObject(existingTaskObject);

@@ -14,11 +14,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import services.ServiceFactory;
 import services.TaskService;
 import utilities.CommonServletUtility;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -57,10 +58,8 @@ class TaskServletTest {
         responseMock = mock(HttpServletResponse.class);
         responseWriter = new StringWriter();
 
-        // injects the TaskService mock into the servlet using reflection
-        Field taskServiceField = TaskServlet.class.getDeclaredField("taskService");
-        taskServiceField.setAccessible(true);
-        taskServiceField.set(servlet, taskServiceMock);
+        // set service factory to use the mock service
+        ServiceFactory.setTaskServiceInstance(taskServiceMock);
 
         when(responseMock.getWriter()).thenReturn(new PrintWriter(responseWriter));
     }
