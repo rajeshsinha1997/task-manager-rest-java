@@ -347,11 +347,8 @@ class TaskServiceTest {
 	void updateTaskWithEmptyRequestBody() {
 		String taskId = UUID.randomUUID().toString();
 
-		// simulates a null request body for the task update
-		TaskPatchRequestDTO patchRequestDTO = null;
-
-		// executes the action to test and captures the exception
-		Exception exception = assertThrows(BadRequestException.class, () -> taskService.updateTaskById(taskId, patchRequestDTO));
+		// executes the action to test and captures the exception (null request body for the task update)
+		Exception exception = assertThrows(BadRequestException.class, () -> taskService.updateTaskById(taskId, null));
 
 		// verifies that the exception message is as expected
 		assertEquals(ErrorMessage.EMPTY_REQUEST_BODY_NOT_VALID, exception.getMessage());
@@ -372,6 +369,8 @@ class TaskServiceTest {
 				BadRequestException.class,
 				() -> taskService.updateTaskById(invalidTaskId, patchRequestDTO),
 				"Expected updateTaskById to throw, but it didn't");
+
+		// verification
 		assertTrue(thrown.getMessage().contains(ErrorMessage.INVALID_TASK_ID + invalidTaskId));
 	}
 }
