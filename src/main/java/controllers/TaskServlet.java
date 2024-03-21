@@ -1,6 +1,10 @@
 package controllers;
 
 import java.io.IOException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 
@@ -25,6 +29,8 @@ import utilities.CommonServletUtility;
  * objects
  */
 public class TaskServlet extends HttpServlet {
+    // create logger instance
+    private static final Logger logger = LogManager.getLogger(TaskServlet.class);
 
     @Override
     /**

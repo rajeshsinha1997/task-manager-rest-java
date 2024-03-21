@@ -20,11 +20,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/tmr/pom.xml') }}
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build with Maven
-        run: mvn -B package --file tmr/pom.xml -DskipTests
+        run: mvn -B package --file pom.xml -DskipTests
 
       - name: Run tests
-        run: mvn -B test --file tmr/pom.xml
+        run: mvn -B test --file pom.xml

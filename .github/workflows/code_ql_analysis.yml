@@ -33,10 +33,10 @@ jobs:
             java-version: 21
         
         - name: Build Java Project
-          run: mvn clean install --file ${{github.workspace}}/tmr/pom.xml -DskipTests
+          run: mvn clean install --file ${{github.workspace}}/pom.xml -DskipTests
 
         - name: Perform CodeQL Analysis
           uses: github/codeql-action/analyze@v3
           with:
-            checkout_path: ${{github.workspace}}/tmr
+            checkout_path: ${{github.workspace}}
             category: "/language:java-kotlin"

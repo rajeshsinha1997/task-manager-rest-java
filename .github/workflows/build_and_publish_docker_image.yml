@@ -36,7 +36,7 @@ jobs:
               with:
                 no-cache: true
                 push: true
-                context: ${{github.workspace}}/tmr/
+                context: ${{github.workspace}}/
                 target: serveprod
                 tags: ${{secrets.DOCKER_USERNAME}}/task-manager-rest-api:${{steps.release_tag_number.outputs.tag}}
             
