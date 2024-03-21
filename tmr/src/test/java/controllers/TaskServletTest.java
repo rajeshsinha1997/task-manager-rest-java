@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import constants.ErrorMessage;
 import dtos.generic.GenericErrorResponseDTO;
 import dtos.generic.GenericResponseDTO;
 import dtos.request.TaskPatchRequestDTO;
@@ -40,6 +41,7 @@ class TaskServletTest {
      * inner class that extends TaskServlet to expose the protected methods
      */
     private static class TestableTaskServlet extends TaskServlet {
+        private boolean doPatchCalled = false;
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
             super.doGet(req, resp);
@@ -48,6 +50,15 @@ class TaskServletTest {
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
             super.doPost(req, resp);
+        }
+        @Override
+        protected void doPatch(HttpServletRequest req, HttpServletResponse resp) {
+            super.doPatch(req, resp);
+            doPatchCalled = true;
+        }
+
+        public boolean isDoPatchCalled() {
+            return doPatchCalled;
         }
     }
 
@@ -100,7 +111,7 @@ class TaskServletTest {
         // assert
         assertNotNull(successResponse);
         assertEquals(1, successResponse.getResponseData().size());
-        assertEquals("T1", successResponse.getResponseData().get(0).getTaskTitle());
+        assertEquals("T1", successResponse.getResponseData().getFirst().getTaskTitle());
     }
 
     /**
@@ -171,7 +182,7 @@ class TaskServletTest {
 
         // verifying creation of a new task and that the response is not empty.
         verify(taskServiceMock).createNewTask(any());
-        assertFalse(!responseWriter.toString().isEmpty());
+        assertTrue(responseWriter.toString().isEmpty());
     }
 
     /**
@@ -377,5 +388,84 @@ class TaskServletTest {
         assertEquals("Updated Title", responseDTO.getResponseData().getTaskTitle());
         assertEquals("Updated Description", responseDTO.getResponseData().getTaskDescription());
         assertTrue(responseDTO.getResponseData().isTaskCompleted());
+    }
+
+    /**
+     * tests the scenario where no path information is provided in the request
+     */
+    @Test
+    void doPatchNoPathInfoTest() {
+        // simulate no path information in the request
+        when(requestMock.getPathInfo()).thenReturn("");
+        servlet.doPatch(requestMock, responseMock);
+
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
+        String responseContent = responseWriter.toString();
+        assertTrue(responseContent.contains(ErrorMessage.TASK_ID_NOT_PROVIDED));
+    }
+
+    /**
+     * tests the scenario where the request leads to a BadRequestException
+     */
+    @Test
+    void doPatchWithBadRequestException() {
+        // simulate request path leading to a BadRequestException
+        when(requestMock.getPathInfo()).thenReturn("");
+        servlet.doPatch(requestMock, responseMock);
+
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
+    }
+
+    /**
+     * tests the scenario where the request body contains invalid JSON
+     */
+    @Test
+    void doPatchWithJsonSyntaxException() throws IOException {
+        // simulate invalid JSON in the request body
+        when(requestMock.getPathInfo()).thenReturn("/validTaskId");
+        when(requestMock.getReader()).thenReturn(new BufferedReader(new StringReader("{invalidJson:")));
+        servlet.doPatch(requestMock, responseMock);
+
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
+    }
+
+    /**
+     * tests the scenario where reading the request body leads to a JsonIOException
+     */
+    @Test
+    void doPatchWithJsonIOException() throws IOException {
+        // simulate JsonIOException when attempting to read the request body
+        when(requestMock.getPathInfo()).thenReturn("/validTaskId");
+        when(requestMock.getReader()).thenThrow(new JsonIOException("IO error"));
+        servlet.doPatch(requestMock, responseMock);
+
+        verify(responseMock).setStatus(SC_INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * tests the scenario where the specified resource ID does not exist
+     */
+    @Test
+    void doPatchWithResourceNotFoundException() throws IOException {
+        // simulate non-existing task ID in request path
+        when(requestMock.getPathInfo()).thenReturn("/nonexistentTaskId");
+        TaskPatchRequestDTO dummyDto = new TaskPatchRequestDTO("Title", "Description", true);
+        when(requestMock.getReader()).thenReturn(new BufferedReader(new StringReader(new Gson().toJson(dummyDto))));
+        when(taskServiceMock.updateTaskById(anyString(), any(TaskPatchRequestDTO.class)))
+                .thenThrow(new ResourceNotFoundException("No task found with given ID"));
+        servlet.doPatch(requestMock, responseMock);
+
+        // assert that NOT FOUND status is returned
+        verify(responseMock).setStatus(SC_NOT_FOUND);
+    }
+
+    /**
+     * test DoPatch call
+     */
+    @Test
+    void whenPatchRequest_thenDoPatchIsCalled() throws ServletException, IOException {
+        when(requestMock.getMethod()).thenReturn("PATCH");
+        servlet.service(requestMock, responseMock);
+        assertTrue(servlet.isDoPatchCalled());
     }
 }
