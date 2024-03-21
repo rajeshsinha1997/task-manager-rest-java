@@ -6,6 +6,7 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import dtos.generic.GenericErrorResponseDTO;
 import dtos.generic.GenericResponseDTO;
+import dtos.request.TaskPatchRequestDTO;
 import dtos.response.TaskDataResponseDTO;
 import exceptions.BadRequestException;
 import exceptions.ResourceNotFoundException;
@@ -333,5 +334,48 @@ class TaskServletTest {
         verify(responseMock).getWriter(); //
         String responseContent = responseWriter.toString();
         assertTrue(responseContent.contains("INVALID REQUEST URL"));
+    }
+
+    /**
+     * checks the successful execution of a PATCH request
+     */
+    @Test
+    void doPatchSuccess() throws Exception {
+        String taskId = "valid-task-id";
+        TaskPatchRequestDTO patchRequestDTO = new TaskPatchRequestDTO("Updated Title", "Updated Description", true);
+        TaskDataResponseDTO updatedTask = new TaskDataResponseDTO(taskId, "Updated Title", "Updated Description", true, "2024-03-17");
+
+        // JSON body of the request
+        String jsonRequestBody = new Gson().toJson(patchRequestDTO);
+        BufferedReader reader = new BufferedReader(new StringReader(jsonRequestBody));
+
+        // set up the HttpServletRequest mock
+        when(requestMock.getPathInfo()).thenReturn("/" + taskId);
+        when(requestMock.getReader()).thenReturn(reader);
+
+        // set up the HttpServletResponse mock
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
+        when(responseMock.getWriter()).thenReturn(writer);
+
+        // set up the TaskService mock
+        when(taskServiceMock.updateTaskById(eq(taskId), any(TaskPatchRequestDTO.class))).thenReturn(updatedTask);
+
+        // execute the doPatch method
+        servlet.doPatch(requestMock, responseMock);
+        writer.flush();
+
+        // verify that the correct HTTP status code is set in the response
+        verify(responseMock).setStatus(HttpServletResponse.SC_OK);
+
+        // convert the StringWriter content into an object for assertion
+        Type type = new TypeToken<GenericResponseDTO<TaskDataResponseDTO>>(){}.getType();
+        GenericResponseDTO<TaskDataResponseDTO> responseDTO = new Gson().fromJson(stringWriter.toString(), type);
+
+        // assertions
+        assertNotNull(responseDTO);
+        assertEquals("Updated Title", responseDTO.getResponseData().getTaskTitle());
+        assertEquals("Updated Description", responseDTO.getResponseData().getTaskDescription());
+        assertTrue(responseDTO.getResponseData().isTaskCompleted());
     }
 }
