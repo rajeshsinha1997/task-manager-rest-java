@@ -15,12 +15,19 @@ import utilities.DataValidationUtility;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import constants.ErrorMessage;
 
 public class TaskService {
+    // create logger instance
+    private static final Logger logger = LogManager.getLogger(TaskService.class);
+
     // create default constructor to limit instantiation capabilities into current
     // package only
     TaskService() {
+        TaskService.logger.info("initialized task service");
     }
 
     /**
@@ -33,6 +40,7 @@ public class TaskService {
     public List<TaskDataResponseDTO> getAllTasks() {
         // call repository method to get list of all available tasks and return after
         // mapping the list items to the required result DTO type
+        TaskService.logger.info("fetching all available task data from reposiotry");
         return RepositoryFactory.getTaskRepositoryInstance().findAllTasks().stream()
                 .map(CommonServletUtility::buildTaskResponseObject)
                 .collect(Collectors.toList());
@@ -108,20 +116,33 @@ public class TaskService {
      */
     public TaskDataResponseDTO getTaskById(String taskId) {
         // check if the given task id is valid
+        TaskService.logger.info("checking if the given task id is valid - " + taskId);
         if (DataValidationUtility.isValidTaskId(taskId)) {
             // find task with the given id from the database
+            TaskService.logger.info("calling repository method to find the task record with the id - " + taskId);
             TaskModel existingTask = RepositoryFactory.getTaskRepositoryInstance().findTaskById(taskId);
+            TaskService.logger.debug(
+                    "fetched task record using task id " + taskId + " - " + existingTask == null
+                            ? null
+                            : CommonServletUtility.getJsonFromObject(existingTask));
 
             // check if the existing task object is null
+            TaskService.logger.info("checking if the task record associated with the task id " + taskId + " is null");
             if (existingTask == null) {
                 // throw corresponding exception
+                TaskService.logger
+                        .error("throw error as the task record corresponding to the task id " + taskId + " is null");
                 throw new ResourceNotFoundException(ErrorMessage.NO_TASK_FOUND_WITH_ID + taskId);
             } else {
                 // map task data to the response type DTO object and return
+                TaskService.logger
+                        .info("return task response object created from the task record fetched with task id - "
+                                + taskId);
                 return CommonServletUtility.buildTaskResponseObject(existingTask);
             }
         } else {
             // throw corresponding exception
+            TaskService.logger.error("throw error as the given task id is invalid - " + taskId);
             throw new BadRequestException(ErrorMessage.INVALID_TASK_ID + taskId);
         }
     }

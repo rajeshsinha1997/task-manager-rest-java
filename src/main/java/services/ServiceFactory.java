@@ -37,6 +37,8 @@ public class ServiceFactory {
      * @return static instance of the service class
      */
     public static TaskService getTaskServiceInstance() {
+        ServiceFactory.logger.debug("checking if any service instance has been created");
+
         // check if the static instance of the service class has not been instantiated
         if (ServiceFactory.taskService == null) {
             ServiceFactory.logger.debug("no service instance available, creating a new service instance");
@@ -47,6 +49,7 @@ public class ServiceFactory {
         }
 
         // return the static instance of the service class
+        ServiceFactory.logger.info("sending back service instance");
         return ServiceFactory.taskService;
     }
 

@@ -37,24 +37,49 @@ public class TaskServlet extends HttpServlet {
      * method to process GET requests and build corresponding responses
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+        // store request method
+        String requestMethod = req.getMethod();
+
+        // log request
+        TaskServlet.logger.info(requestMethod + " request received");
+        TaskServlet.logger.debug(CommonServletUtility.getJsonFromObject(req));
+
         // get service instance from factory
+        TaskServlet.logger.debug("requesting instance of service");
         TaskService taskService = ServiceFactory.getTaskServiceInstance();
+        TaskServlet.logger.debug("received instance of service");
 
         try {
-            // check if no path information is provided along with the request
+            // check if no path information has been provided along with the request
             if (CommonServletUtility.isRequestPathInformationBlank(req)) {
+                TaskServlet.logger.info(requestMethod + " request path information is blank");
+
                 // build success response with the result from calling the service function to
                 // get list of all available tasks
+                TaskServlet.logger.info("fetching all available tasks and building success response");
                 CommonServletUtility.buildSuccessResponse(resp, 200, taskService.getAllTasks());
+                TaskServlet.logger.info("finished building success response with all available tasks");
             } else {
+                TaskServlet.logger.info(requestMethod + " request contains path information data - "
+                        + CommonServletUtility.getRequestUrlPathInfo(req));
+
+                // get task id from the path information received with the request
+                TaskServlet.logger.debug("extracting task id from the path information of request " + requestMethod);
+                String taskId = CommonServletUtility.getResourceIdFromRequestPathInformation(req);
+                TaskServlet.logger.info(
+                        "extracted task id from the path information of request " + requestMethod + " - " + taskId);
+
                 // find task object with given id and build success response with the existing
                 // task data
-                CommonServletUtility.buildSuccessResponse(resp, 200,
-                        taskService
-                                .getTaskById(CommonServletUtility.getResourceIdFromRequestPathInformation(req)));
+                TaskServlet.logger
+                        .info("building response with task information corresponding to given task id - " + taskId);
+                CommonServletUtility.buildSuccessResponse(resp, 200, taskService.getTaskById(taskId));
+                TaskServlet.logger.info(
+                        "finished building response with task information corresponding to given task id - " + taskId);
             }
         } catch (ResourceNotFoundException | BadRequestException e) {
             // call exception handler method
+            TaskServlet.logger.error("error processing request - " + e);
             CommonServletUtility.buildApplicationExceptionResponse(e, resp);
         }
     }

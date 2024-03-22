@@ -2,6 +2,9 @@ package utilities;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
@@ -17,6 +20,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import models.TaskModel;
 
 public class CommonServletUtility {
+    // create logger instance
+    private static final Logger logger = LogManager.getLogger(CommonServletUtility.class);
 
     /**
      * private constructor to forbid instantiation
@@ -47,6 +52,18 @@ public class CommonServletUtility {
     }
 
     /**
+     * method to get JSON representatiion as String of a java object
+     * 
+     * @param sourceObject - java object to be converted to json string
+     * @return json representation as String of the given Java object
+     */
+    public static String getJsonFromObject(Object sourceObject) {
+        CommonServletUtility.logger
+                .debug("creating JSON representation for an instance of " + sourceObject.getClass().getName());
+        return new Gson().toJson(sourceObject);
+    }
+
+    /**
      * method to build error response
      * 
      * @param response        - instance of HttpServletResponse
@@ -55,19 +72,27 @@ public class CommonServletUtility {
      */
     public static void buildErrorResponse(HttpServletResponse response, int errorStatusCode, Throwable e) {
         // set response metadata
+        CommonServletUtility.logger.info("adding error response metadata");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(errorStatusCode);
+        CommonServletUtility.logger.debug("added error response metadata");
 
         try {
             // add error information data to the error response if the given error object is
             // not null
+            CommonServletUtility.logger.debug("checking if any error object has been provided");
             if (e != null) {
+                CommonServletUtility.logger.info("adding error information to the error response");
                 response.getWriter()
-                        .write(new Gson().toJson(new GenericErrorResponseDTO(e.getLocalizedMessage())));
+                        .write(CommonServletUtility
+                                .getJsonFromObject(new GenericErrorResponseDTO(e.getLocalizedMessage())));
+                CommonServletUtility.logger.debug("added error information to the error response");
             }
+
+            CommonServletUtility.logger.info("finished building error response");
         } catch (IOException exception) {
-            // TODO: log error message to console
+            CommonServletUtility.logger.error("error building error response - " + e);
         }
     }
 
@@ -83,17 +108,27 @@ public class CommonServletUtility {
      */
     public static <T> void buildSuccessResponse(HttpServletResponse response, int responseStatusCode, T responseData) {
         // set response metadata
+        CommonServletUtility.logger.info("adding success response metadada");
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(responseStatusCode);
+        CommonServletUtility.logger.debug("added success response metadata");
 
         try {
             // add response data to response if the given response data is not null
+            CommonServletUtility.logger.debug("checking if success response data is null");
             if (responseData != null) {
-                response.getWriter().write(new Gson().toJson(new GenericResponseDTO<T>(responseData)));
+                CommonServletUtility.logger.info("adding success response data to the response");
+                CommonServletUtility.logger.debug(CommonServletUtility.getJsonFromObject(responseData));
+
+                response.getWriter().write(
+                        CommonServletUtility.getJsonFromObject(new GenericResponseDTO<T>(responseData)));
+                CommonServletUtility.logger.debug("added success response data to the response");
             }
+
+            CommonServletUtility.logger.info("finished building success response");
         } catch (IOException e) {
-            // TODO: log error message to console
+            CommonServletUtility.logger.error("error building success response - " + e);
         }
     }
 
@@ -106,33 +141,45 @@ public class CommonServletUtility {
      */
     public static String getRequestUrlPathInfo(HttpServletRequest request) {
         // get path information from the request url
+        CommonServletUtility.logger.info("extracting path information from the request");
         String pathInformation = request.getPathInfo();
+        CommonServletUtility.logger.debug("extracted path information from the request - " + pathInformation);
 
         // check if the path information was not present or is an empty string or only
         // contains a single '/'
+        CommonServletUtility.logger.info("checking if the extracted path information is null or blank");
         if (pathInformation == null || pathInformation.isBlank() || pathInformation.trim().equals("/")) {
             // return an empty string value
+            CommonServletUtility.logger.info("extracted path information is blank");
             return "";
         } else {
             // trim the leading and trailing white-spaces from the path information data
+            CommonServletUtility.logger
+                    .info("trimming the leading and trailing white-spaces from the path information");
             pathInformation = pathInformation.trim();
+            CommonServletUtility.logger
+                    .debug("trimmed the leading and trailing white-spaces from the path information");
 
-            // check if the given request path information data starts with a '/' then
-            // remove it from the request path information data
-            if (pathInformation.length() > 0 && pathInformation.charAt(0) == '/') {
+            // remove any leading '/' from the path information
+            CommonServletUtility.logger.info("removing any leading '/' from the path information");
+            while (pathInformation.length() > 0 && pathInformation.charAt(0) == '/') {
                 pathInformation = pathInformation.substring(1,
                         pathInformation.length());
             }
+            CommonServletUtility.logger.debug("removed all leading '/' from the path information");
 
-            // check if the given request path information data ends with a '/' then
-            // remove it from the request path information data
-            if (pathInformation.charAt(pathInformation.length() - 1) == '/') {
+            // remove any trailing '/' from the path information
+            CommonServletUtility.logger.info("removing any trailing '/' from the path information");
+            while (pathInformation.length() > 0 && pathInformation.charAt(pathInformation.length() - 1) == '/') {
                 pathInformation = pathInformation.substring(0,
                         pathInformation.length() - 1);
             }
+            CommonServletUtility.logger.debug("removed trailing '/' from the path information");
 
-            // return the path information string after trimming the leading and trailing
-            // white-spaces
+            // return the path information string
+            CommonServletUtility.logger
+                    .info("returning formatted path information extracted from the request - "
+                            + pathInformation.trim());
             return pathInformation.trim();
         }
     }
@@ -147,6 +194,7 @@ public class CommonServletUtility {
     public static String[] getRequestPathInformationDataAsArray(String requestPathInformationData) {
         // create and return the string array by splitting the request path information
         // data by '/'
+        CommonServletUtility.logger.debug("creating an array from the path information data received with the request");
         return requestPathInformationData.split("/");
     }
 
@@ -160,6 +208,9 @@ public class CommonServletUtility {
     public static TaskDataResponseDTO buildTaskResponseObject(TaskModel taskData) {
         // create a new instance of TaskDataResponseDTO and return it after populating
         // the required data
+        CommonServletUtility.logger.debug("creating response dto object to return task data");
+        CommonServletUtility.logger.debug(CommonServletUtility.getJsonFromObject(taskData));
+        ;
         return new TaskDataResponseDTO(taskData.getTaskId(), taskData.getTaskTitle(), taskData.getTaskDescription(),
                 taskData.isTaskCompleted(),
                 taskData.getTaskCreatedOn());
@@ -176,16 +227,20 @@ public class CommonServletUtility {
         // JsonSyntaxException
         if (e instanceof BadRequestException || e instanceof JsonSyntaxException) {
             // build error response with response status code as 400 - BAD REQUEST
+            CommonServletUtility.logger.info("building a BAD-REQUEST error response with message - " + e.getMessage());
             CommonServletUtility.buildErrorResponse(response, 400, e);
         }
         // else check if the exception instance belongs to BadRequestException
         else if (e instanceof ResourceNotFoundException) {
             // build error response with response status code as 404 - NOT FOUND
+            CommonServletUtility.logger.info("building a NOT-FOUND error response with message - " + e.getMessage());
             CommonServletUtility.buildErrorResponse(response, 404, e);
         }
         // else build error response with response status code as 500 - INTERNAL SERVER
         // ERROR
         else {
+            CommonServletUtility.logger
+                    .info("building a INTERNAL-SERVER-ERROR error response with message - " + e.getMessage());
             CommonServletUtility.buildErrorResponse(response, 500, e);
         }
     }
@@ -198,6 +253,7 @@ public class CommonServletUtility {
      *         otherwise
      */
     public static boolean isRequestPathInformationBlank(HttpServletRequest request) {
+        CommonServletUtility.logger.debug("checking if request contains any path information");
         return CommonServletUtility.getRequestUrlPathInfo(request).isBlank();
     }
 
@@ -210,16 +266,20 @@ public class CommonServletUtility {
      */
     public static String getResourceIdFromRequestPathInformation(HttpServletRequest request) {
         // get path information data array
+        CommonServletUtility.logger.info("creating an array from the path information data received with the request");
         String[] pathInformationDataArray = CommonServletUtility
                 .getRequestPathInformationDataAsArray(CommonServletUtility.getRequestUrlPathInfo(request));
 
         // check if the path information data array contains more than one element
+        CommonServletUtility.logger.debug("checking if the path information array contains more than one element");
         if (pathInformationDataArray.length > 1) {
             // throw corresponding exception
+            CommonServletUtility.logger.error("throw error as path information array contains more than one element");
             throw new BadRequestException(ErrorMessage.INVALID_REQUEST_URL);
         }
 
         // return the first entry of the path information data array
+        CommonServletUtility.logger.info("return first elememt of the path information array");
         return pathInformationDataArray[0];
     }
 }
