@@ -1,5 +1,7 @@
 package services;
 
+import constants.ErrorMessage;
+import dtos.request.TaskPatchRequestDTO;
 import dtos.request.TaskPostRequestDTO;
 import dtos.response.TaskDataResponseDTO;
 import exceptions.BadRequestException;
@@ -106,7 +108,7 @@ class TaskServiceTest {
 		assertNotNull(responseDTOS, "The list of response DTOs should not be null.");
 		assertEquals(taskModels.size(), responseDTOS.size(),
 				"The number of tasks returned should match the number of models.");
-		assertEquals(taskModels.get(0).getTaskTitle(), responseDTOS.get(0).getTaskTitle(),
+		assertEquals(taskModels.getFirst().getTaskTitle(), responseDTOS.getFirst().getTaskTitle(),
 				"The task titles should match.");
 
 		// verify
@@ -284,5 +286,91 @@ class TaskServiceTest {
 
 		// verify that deleteTaskById was not called because the exception
 		verify(taskRepositoryMock, never()).deleteTaskById(anyString());
+	}
+
+	/**
+	 * tests successful task update
+	 */
+	@Test
+	void updateTaskByIdSuccess() {
+		String taskId = UUID.randomUUID().toString();
+
+		// existing task data
+		TaskModel existingTask = new TaskModel(taskId, "Test Title", "Test Description", "2021-01-01", "2021-01-02", false, false);
+
+		// new data for the task
+		TaskPatchRequestDTO patchRequestDTO = new TaskPatchRequestDTO("New Title", "New Description", true);
+
+		when(taskRepositoryMock.findTaskById(taskId)).thenReturn(existingTask);
+
+		// performs the action to test
+		TaskDataResponseDTO updatedTask = taskService.updateTaskById(taskId, patchRequestDTO);
+
+		// verifications and assertions
+		assertNotNull(updatedTask);
+		assertEquals("New Title", updatedTask.getTaskTitle());
+		assertEquals("New Description", updatedTask.getTaskDescription());
+		assertTrue(updatedTask.isTaskCompleted());
+
+		// verifies that the repository was called correctly
+		verify(taskRepositoryMock).updateTaskById(eq(taskId), any(TaskModel.class));
+	}
+
+	/**
+	 * tests updating a task that does not exist
+	 */
+	@Test
+	void updateNonExistingTask() {
+		String nonExistingTaskId = UUID.randomUUID().toString();
+
+		// new data for the non-existing task
+		TaskPatchRequestDTO patchRequestDTO = new TaskPatchRequestDTO("New Title", "New Description", true);
+
+		// sets the expected behavior of the repository to simulate that the task does not exist
+		when(taskRepositoryMock.findTaskById(nonExistingTaskId)).thenReturn(null);
+
+		// executes the action to test and captures the exception
+		Exception exception = assertThrows(ResourceNotFoundException.class, () -> taskService.updateTaskById(nonExistingTaskId, patchRequestDTO));
+
+		// verifies that the exception message is as expected
+		assertTrue(exception.getMessage().contains("NO TASK FOUND WITH GIVEN ID"));
+
+		// verifies that an attempt was made to find the task, but not to update it, since it does not exist
+		verify(taskRepositoryMock).findTaskById(nonExistingTaskId);
+		verify(taskRepositoryMock, never()).updateTaskById(eq(nonExistingTaskId), any(TaskModel.class));
+	}
+
+	/**
+	 * tests updating a task with an empty request body
+	 */
+	@Test
+	void updateTaskWithEmptyRequestBody() {
+		String taskId = UUID.randomUUID().toString();
+
+		// executes the action to test and captures the exception (null request body for the task update)
+		Exception exception = assertThrows(BadRequestException.class, () -> taskService.updateTaskById(taskId, null));
+
+		// verifies that the exception message is as expected
+		assertEquals(ErrorMessage.EMPTY_REQUEST_BODY_NOT_VALID, exception.getMessage());
+
+		// verifies that there was no interaction with the taskRepository
+		verifyNoInteractions(taskRepositoryMock);
+	}
+
+	/**
+	 * tests updating a task with an invalid task ID
+	 */
+	@Test
+	void updateTaskWithInvalidIdThrowsBadRequestException() {
+		String invalidTaskId = "not-a-valid-uuid";
+		TaskPatchRequestDTO patchRequestDTO = new TaskPatchRequestDTO("New Title", "New Description", true);
+
+		BadRequestException thrown = assertThrows(
+				BadRequestException.class,
+				() -> taskService.updateTaskById(invalidTaskId, patchRequestDTO),
+				"Expected updateTaskById to throw, but it didn't");
+
+		// verification
+		assertTrue(thrown.getMessage().contains(ErrorMessage.INVALID_TASK_ID + invalidTaskId));
 	}
 }

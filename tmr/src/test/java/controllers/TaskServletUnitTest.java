@@ -3,123 +3,26 @@ package controllers;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
+import constants.ErrorMessage;
 import dtos.generic.GenericErrorResponseDTO;
-import dtos.generic.GenericResponseDTO;
-import dtos.response.TaskDataResponseDTO;
 import exceptions.BadRequestException;
-import exceptions.ResourceNotFoundException;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import services.ServiceFactory;
-import services.TaskService;
 import utilities.CommonServletUtility;
 
-import java.io.*;
-import java.lang.reflect.Type;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
 
 import static jakarta.servlet.http.HttpServletResponse.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class TaskServletTest {
-
-    private TaskServletTest.TestableTaskServlet servlet;
-    private TaskService taskServiceMock;
-    private HttpServletRequest requestMock;
-    private HttpServletResponse responseMock;
-    private StringWriter responseWriter;
-
-    /**
-     * inner class that extends TaskServlet to expose the protected methods
-     */
-    private static class TestableTaskServlet extends TaskServlet {
-        @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-            super.doGet(req, resp);
-        }
-
-        @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
-            super.doPost(req, resp);
-        }
-    }
-
-    @BeforeEach
-    void setUp() throws Exception {
-        servlet = new TaskServletTest.TestableTaskServlet();
-        taskServiceMock = mock(TaskService.class);
-        requestMock = mock(HttpServletRequest.class);
-        responseMock = mock(HttpServletResponse.class);
-        responseWriter = new StringWriter();
-
-        // set service factory to use the mock service
-        ServiceFactory.setTaskServiceInstance(taskServiceMock);
-
-        when(responseMock.getWriter()).thenReturn(new PrintWriter(responseWriter));
-    }
-
-    /**
-     * tests the doGet method to ensure it properly handles GET requests
-     */
-    @Test
-    void doGet() throws ServletException {
-        servlet.doGet(requestMock, responseMock);
-
-        // verify
-        verify(taskServiceMock).getAllTasks();
-
-        // assert
-        assertFalse(responseWriter.toString().isEmpty());
-    }
-
-    /**
-     * tests the doGet method to check it returns a success response with task data
-     */
-    @Test
-    void getWithSuccess() throws Exception {
-        List<TaskDataResponseDTO> tasks = List.of(new TaskDataResponseDTO("1", "T1", "Description 1", false, "D1"));
-        when(taskServiceMock.getAllTasks()).thenReturn(tasks);
-
-        servlet.doGet(requestMock, responseMock);
-
-        // checking for correct response
-        verify(responseMock).setStatus(HttpServletResponse.SC_OK);
-
-        Type responseType = new TypeToken<GenericResponseDTO<List<TaskDataResponseDTO>>>() {
-        }.getType();
-        GenericResponseDTO<List<TaskDataResponseDTO>> successResponse = new Gson().fromJson(responseWriter.toString(),
-                responseType);
-
-        // assert
-        assertNotNull(successResponse);
-        assertEquals(1, successResponse.getResponseData().size());
-        assertEquals("T1", successResponse.getResponseData().get(0).getTaskTitle());
-    }
-
-    /**
-     * tests handling GET request with a specific task ID, expecting a successful
-     * response
-     */
-    @Test
-    void getByIdSuccess() throws Exception {
-        String taskId = "existing-id";
-        TaskDataResponseDTO task = new TaskDataResponseDTO(taskId, "Title", "Description", false, "CreatedOn");
-        when(taskServiceMock.getTaskById(taskId)).thenReturn(task);
-
-        // mocking the request
-        when(requestMock.getPathInfo()).thenReturn("/" + taskId);
-
-        servlet.doGet(requestMock, responseMock);
-
-        // verifying the success status
-        verify(responseMock).setStatus(HttpServletResponse.SC_OK);
-    }
+class TaskServletUnitTest extends TaskServletTestBase {
 
     /**
      * tests handling GET request with invalid URL, expecting a 404 response
@@ -144,8 +47,7 @@ class TaskServletTest {
         String invalidTaskId = "invalid-id";
         when(CommonServletUtility.getRequestUrlPathInfo(requestMock)).thenReturn("/" + invalidTaskId);
 
-        // simulate that taskService.getTaskById will throw an exception when passed an
-        // invalid ID
+        // simulate that taskService.getTaskById will throw an exception when passed an invalid ID
         when(taskServiceMock.getTaskById(invalidTaskId))
                 .thenThrow(new BadRequestException("Invalid task ID"));
 
@@ -154,23 +56,6 @@ class TaskServletTest {
 
         // verify that the correct response status code has been set
         verify(responseMock).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-    }
-
-    /**
-     * tests the doPost method to ensure it correctly handles POST requests by
-     * creating new tasks
-     */
-    @Test
-    void doPost() throws ServletException, IOException {
-        String jsonData = "{\"task-title\":\"Test Task\", \"task-description\":\"This is a test task\"}";
-        BufferedReader reader = new BufferedReader(new StringReader(jsonData));
-        when(requestMock.getReader()).thenReturn(reader);
-
-        servlet.doPost(requestMock, responseMock);
-
-        // verifying creation of a new task and that the response is not empty.
-        verify(taskServiceMock).createNewTask(any());
-        assertFalse(!responseWriter.toString().isEmpty());
     }
 
     /**
@@ -249,50 +134,11 @@ class TaskServletTest {
     }
 
     /**
-     * tests deletion with a valid task ID, expecting a successful response
-     */
-    @Test
-    void doDeleteValidTask() throws ServletException, IOException {
-        // assume a valid task ID is provided in the path info
-        String validTaskId = "valid-task-id";
-        when(CommonServletUtility.getRequestUrlPathInfo(requestMock)).thenReturn("/" + validTaskId);
-        servlet.doDelete(requestMock, responseMock);
-
-        // verify that the deleteTaskById method of the taskService is called with the
-        // correct task ID
-        verify(taskServiceMock).deleteTaskById(validTaskId);
-
-        // verify that the correct response status code has been set
-        verify(responseMock).setStatus(HttpServletResponse.SC_OK);
-    }
-
-    /**
-     * tests handling DELETE request for a non-existing task ID, expecting an
-     * error
-     * response
-     */
-    @Test
-    void deleteNotFound() throws Exception {
-        String nonExistingTaskId = "non-existing-id";
-
-        // simulating an exception
-        doThrow(new ResourceNotFoundException("No task found with given ID")).when(taskServiceMock)
-                .deleteTaskById(nonExistingTaskId);
-
-        when(requestMock.getPathInfo()).thenReturn("/" + nonExistingTaskId);
-
-        servlet.doDelete(requestMock, responseMock);
-
-        // checking that the correct error status is set
-        verify(responseMock).setStatus(HttpServletResponse.SC_NOT_FOUND);
-    }
-
-    /**
      * tests deletion without path info, expecting a BAD_REQUEST response
      */
     @Test
     void deleteNoPathInfoTest() throws ServletException, IOException {
-        // Simulate no path information
+        // simulate no path information
         when(requestMock.getPathInfo()).thenReturn("");
         servlet.doDelete(requestMock, responseMock);
 
@@ -328,10 +174,72 @@ class TaskServletTest {
         // verify that the response has the HTTP 404 status
         verify(responseMock).setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-        // verify that buildErrorResponse is called with the correct status and
-        // exception
+        // verify that buildErrorResponse is called with the correct status and exception
         verify(responseMock).getWriter(); //
         String responseContent = responseWriter.toString();
         assertTrue(responseContent.contains("INVALID REQUEST URL"));
+    }
+
+    /**
+     * tests the scenario where no path information is provided in the request
+     */
+    @Test
+    void doPatchNoPathInfoTest() {
+
+        // simulate no path information in the request
+        when(requestMock.getPathInfo()).thenReturn("");
+        servlet.doPatch(requestMock, responseMock);
+
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
+        String responseContent = responseWriter.toString();
+        assertTrue(responseContent.contains(ErrorMessage.TASK_ID_NOT_PROVIDED));
+    }
+
+    /**
+     * tests the scenario where the request leads to a BadRequestException
+     */
+    @Test
+    void doPatchWithBadRequestException() {
+        // simulate request path leading to a BadRequestException
+        when(requestMock.getPathInfo()).thenReturn("");
+        servlet.doPatch(requestMock, responseMock);
+
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
+    }
+
+    /**
+     * tests the scenario where the request body contains invalid JSON
+     */
+    @Test
+    void doPatchWithJsonSyntaxException() throws IOException {
+        // simulate invalid JSON in the request body
+        when(requestMock.getPathInfo()).thenReturn("/validTaskId");
+        when(requestMock.getReader()).thenReturn(new BufferedReader(new StringReader("{invalidJson:")));
+        servlet.doPatch(requestMock, responseMock);
+
+        verify(responseMock).setStatus(SC_BAD_REQUEST);
+    }
+
+    /**
+     * tests the scenario where reading the request body leads to a JsonIOException
+     */
+    @Test
+    void doPatchWithJsonIOException() throws IOException {
+        // simulate JsonIOException when attempting to read the request body
+        when(requestMock.getPathInfo()).thenReturn("/validTaskId");
+        when(requestMock.getReader()).thenThrow(new JsonIOException("IO error"));
+        servlet.doPatch(requestMock, responseMock);
+
+        verify(responseMock).setStatus(SC_INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * test DoPatch call
+     */
+    @Test
+    void whenPatchRequest_thenDoPatchIsCalled() throws ServletException, IOException {
+        when(requestMock.getMethod()).thenReturn("PATCH");
+        servlet.service(requestMock, responseMock);
+        assertTrue(servlet.isDoPatchCalled());
     }
 }
